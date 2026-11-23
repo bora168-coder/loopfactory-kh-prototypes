@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LoopFactory KH — គម្រោង Proposal សារណាអន្តរកម្ម (ភាសាខ្មែរ)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+Khmer:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<style>
+  :root {
+    --paper: #FAF9F6;
+    --surface: #FFFFFF;
+    --ink: #111827;
+    --muted: #4B5563;
+    --hair: #E5E2DC;
+    --accent: #14532D;
+  }
+  body {
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: 'Noto Sans Khmer', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.72;
+    margin: 0;
+  }
+  .font-mono-code {
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .nav-tab {
+    border-bottom: 2px solid transparent;
+    color: var(--muted);
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  .nav-tab:hover {
+    color: var(--ink);
+  }
+  .nav-tab.active {
+    color: var(--ink);
+    border-bottom-color: var(--accent);
+    font-weight: 600;
+  }
+  .pill-btn {
+    padding: 6px 13px;
+    font-size: 0.82rem;
+    border-radius: 6px;
+    border: 1px solid var(--hair);
+    background: var(--surface);
+    color: var(--muted);
+    transition: all 0.15s ease;
+  }
+  .pill-btn:hover {
+    color: var(--ink);
+  }
+  .pill-btn.active {
+    background: var(--ink);
+    color: #FFFFFF;
+    border-color: var(--ink);
+  }
+  .toast-pop {
+    animation: fadeInUp 0.2s ease-out;
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-30 bg-[#FAF9F6]/95 backdrop-blur border-b border-[#E5E2DC]">
+    <div class="max-w-[1120px] mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-[#111827]">
+          Proposal សារណា៖ LoopFactory KH <span class="text-sm font-normal text-[#4B5563]">(ACLEDA University — FST)</span>
+        </h1>
+        <p class="text-xs sm:text-sm text-[#4B5563]">
+          ឯកសារ Proposal អន្តរកម្មជាភាសាខ្មែរនិយាយធម្មតាស្រួលយល់ សម្រាប់ក្រុមនិស្សិតទាំង ៥ នាក់ពិនិត្យ និងត្រៀមឡើង Proposal Defense។
+        </p>
+      </div>
+      <div class="flex items-center gap-2 text-xs font-mono-code">
+        <span id="readinessBadge" class="px-3 py-1.5 rounded border border-[#14532D] text-[#14532D] bg-white">FST-01 Ready: 0%</span>
+      </div>
+    </div>
+
+    <!-- Section Navigation -->
+    <nav aria-label="Proposal Sections" class="max-w-[1120px] mx-auto px-4 sm:px-6 overflow-x-auto">
+      <div id="mainTabs" class="flex items-center gap-4 sm:gap-5 whitespace-nowrap text-xs sm:text-sm">
+        <button type="button" data-tab="team" class="nav-tab active py-2.5">១. ក្រុម &amp; FST-01</button>
+        <button type="button" data-tab="problem" class="nav-tab py-2.5">២. បញ្ហា &amp; Scope</button>
+        <button type="button" data-tab="bench" class="nav-tab py-2.5">៣. ប្រៀបធៀប (Benchmarking)</button>
+        <button type="button" data-tab="schema" class="nav-tab py-2.5">៤. Tech &amp; 3NF DB</button>
+        <button type="button" data-tab="gantt" class="nav-tab py-2.5">៥. កាលវិភាគ ២០ សប្តាហ៍</button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Content Area -->
+  <main class="flex-1 max-w-[1120px] w-full mx-auto px-4 sm:px-6 py-6 sm:py-8">
+    <div id="proposalRoot"></div>
+  </main>
+
+  <!-- Toast -->
+  <div id="toastArea" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+<script>
+(function() {
+  const PREREQS = ['OOP', 'DBMS', 'SDLC', 'Web/Mobile', 'Algo', 'Proj Mgmt'];
+
+  const state = {
+    activeTab: 'team',
+    scopeView: 'in',
+    benchFilter: 'all',
+    selectedTable: 'byproduct_listings',
+    repoUrl: '',
+    members: [
+      { id: '0006580', nameKm: 'ពន្លឹង បូរ៉ា', nameEn: 'Ponloeng Bora', role: 'Project Lead / Architect', gpa: '3.87', passed: { OOP: true, DBMS: true, SDLC: true, 'Web/Mobile': true, Algo: true, 'Proj Mgmt': true } },
+      { id: '0007679', nameKm: 'ផល់ រក្សា', nameEn: 'Phal Raksa', role: 'Back-end & DB Engineer', gpa: '3.90', passed: { OOP: true, DBMS: true, SDLC: true, 'Web/Mobile': true, Algo: true, 'Proj Mgmt': true } },
+      { id: '0005957', nameKm: 'តាន់ ម៉ោងគ័ង', nameEn: 'Tan Mengkoung', role: 'Front-end / QA Engineer', gpa: '3.80', passed: { OOP: true, DBMS: true, SDLC: true, 'Web/Mobile': true, Algo: true, 'Proj Mgmt': true } },
+      { id: '0007635', nameKm: 'ហាក់ វត្តី', nameEn: 'Hak Vuttey', role: 'Front-end / QA Engineer', gpa: '3.75', passed: { OOP: true, DBMS: true, SDLC: true, 'Web/Mobile': true, Algo: true, 'Proj Mgmt': true } },
+      { id: '0007912', nameKm: 'ជា សារឿន', nameEn: 'Chea Saroeurn', role: 'Front-end / QA Engineer', gpa: '3.82', passed: { OOP: true, DBMS: true, SDLC: true, 'Web/Mobile': true, Algo: true, 'Proj Mgmt': true } }
+    ],
+    schemaTables: [
+      {
+        name: 'users',
+        purpose: 'រក្សាទុកគណនីអ្នកប្រើប្រាស់ទាំង ៣ Role (RBAC) ជាមួយលេខសម្ងាត់ដែល Hash រួច។',
+        cols: [
+          { c: 'id', t: 'UUID (PK)', d: 'លេខសម្គាល់អ្នកប្រើប្រាស់' },
+          { c: 'email', t: 'VARCHAR UNIQUE', d: 'អ៊ីមែលសម្រាប់ Login' },
+          { c: 'password_hash', t: 'TEXT', d: 'លេខសម្ងាត់ Hash ដោយ Bcrypt/Argon2' },
+          { c: 'role', t: 'ENUM', d: 'SELLER | BUYER | ADMIN' },
+          { c: 'is_active', t: 'BOOLEAN', d: 'ស្ថានភាពបើក ឬផ្អាកគណនី' }
+        ]
+      },
+      {
+        name: 'organizations',
+        purpose: 'ផ្ទុកព័ត៌មានរោងចក្រ សិប្បកម្ម ឬក្រុមហ៊ុន Recycle ដែល Admin ត្រូវ Verify អាជ្ញាប័ណ្ណ។',
+        cols: [
+          { c: 'id', t: 'UUID (PK)', d: 'លេខសម្គាល់អង្គភាព' },
+          { c: 'user_id', t: 'UUID (FK → users)', d: 'ម្ចាស់គណនីគ្រប់គ្រង' },
+          { c: 'org_name', t: 'VARCHAR', d: 'ឈ្មោះរោងចក្រ ឬសិប្បកម្ម' },
+          { c: 'org_type', t: 'ENUM', d: 'FACTORY | AGRO_SME | RECYCLER | ARTISAN' },
+          { c: 'province', t: 'VARCHAR', d: 'ខេត្ត / រាជធានីសម្រាប់ Filter' },
+          { c: 'verified_status', t: 'ENUM', d: 'PENDING | VERIFIED | SUSPENDED (ទប់ស្កាត់ឡឥដ្ឋ)' }
+        ]
+      },
+      {
+        name: 'material_categories',
+        purpose: 'កំណត់ប្រភេទកាកសំណល់ និងតម្លៃ Emission Factor សម្រាប់គណនា CO₂ ស្វ័យប្រវត្តិ។',
+        cols: [
+          { c: 'id', t: 'SERIAL (PK)', d: 'លេខសម្គាល់ប្រភេទ' },
+          { c: 'name_en / name_kh', t: 'VARCHAR', d: 'ឈ្មោះភាសាអង់គ្លេស និងខ្មែរ (ឧ. កម្ទេចក្រណាត់)' },
+          { c: 'co2_saved_per_kg', t: 'DECIMAL', d: 'បរិមាណ kg CO₂e ដែលសង្គ្រោះបានក្នុង ១ kg' }
+        ]
+      },
+      {
+        name: 'byproduct_listings',
+        purpose: 'តារាងបង្ហោះកាកសំណល់ស្អាតដែលរោងចក្រដាក់លក់លើទីផ្សារ B2B។',
+        cols: [
+          { c: 'id', t: 'UUID (PK)', d: 'លេខសម្គាល់ប្រកាស' },
+          { c: 'org_id', t: 'UUID (FK → organizations)', d: 'រោងចក្រអ្នកបង្ហោះ' },
+          { c: 'category_id', t: 'INT (FK → material_categories)', d: 'ប្រភេទកាកសំណល់' },
+          { c: 'weight_kg', t: 'DECIMAL', d: 'ទម្ងន់សរុបជាគីឡូក្រាម' },
+          { c: 'price_per_kg_usd', t: 'DECIMAL', d: 'តម្លៃក្នុង ១ kg ជា USD' },
+          { c: 'status', t: 'ENUM', d: 'AVAILABLE | CLAIMED | COMPLETED' }
+        ]
+      },
+      {
+        name: 'exchange_orders',
+        purpose: 'កត់ត្រាសំណើសុំទិញ និងការណាត់ជួបដឹកជញ្ជូនរវាង Seller និង Verified Buyer។',
+        cols: [
+          { c: 'id', t: 'UUID (PK)', d: 'លេខកូដ Order' },
+          { c: 'listing_id', t: 'UUID (FK → byproduct_listings)', d: 'ទំនិញដែលបានស្នើទិញ' },
+          { c: 'buyer_org_id', t: 'UUID (FK → organizations)', d: 'អ្នកទិញដែលបាន Verify' },
+          { c: 'agreed_weight_kg', t: 'DECIMAL', d: 'ទម្ងន់ព្រមព្រៀង' },
+          { c: 'total_usd', t: 'DECIMAL', d: 'តម្លៃសរុបជា USD' },
+          { c: 'order_status', t: 'ENUM', d: 'PENDING | APPROVED | COMPLETED | CANCELLED' }
+        ]
+      },
+      {
+        name: 'disposal_verifications',
+        purpose: 'តារាងក្រមសីលធម៌បញ្ជាក់ការកែច្នៃត្រឹមត្រូវ ដោយគ្មានការដុតក្នុងឡឥដ្ឋ។',
+        cols: [
+          { c: 'id', t: 'UUID (PK)', d: 'លេខសម្គាល់ការបញ្ជាក់' },
+          { c: 'order_id', t: 'UUID (FK → exchange_orders)', d: 'Order ដែលបានបញ្ចប់' },
+          { c: 'reuse_method', t: 'TEXT', d: 'វិធីសាស្ត្រកែច្នៃពិតប្រាកដ' },
+          { c: 'anti_burning_confirmed', t: 'BOOLEAN', d: 'កិច្ចសន្យាបញ្ជាក់មិនដុតបំផ្លាញ' },
+          { c: 'verified_at', t: 'TIMESTAMP', d: 'កាលបរិច្ឆេទបិទ Circular Loop' }
+        ]
+      },
+      {
+        name: 'audit_logs',
+        purpose: 'កត់ត្រារាល់សកម្មភាពសំខាន់ៗក្នុងប្រព័ន្ធសម្រាប់សុវត្ថិភាព និងតម្លាភាព។',
+        cols: [
+          { c: 'id', t: 'BIGSERIAL (PK)', d: 'លេខរៀងកំណត់ត្រា' },
+          { c: 'user_id', t: 'UUID (FK → users)', d: 'អ្នកធ្វើសកម្មភាព' },
+          { c: 'action', t: 'VARCHAR', d: 'POST_LISTING, APPROVE, SUSPEND ។ល។' },
+          { c: 'created_at', t: 'TIMESTAMP', d: 'ម៉ោង និងកាលបរិច្ឆេទ' }
+        ]
+      }
+    ],
+    phases: [
+      { id: 1, weeks: 'សប្តាហ៍ ១–២', start: 0, span: 10, title: 'ជ្រើសរើសប្រធានបទ & បង្កើតក្រុម', desc: 'ដាក់ Form FST-01 ("LoopFactory KH"), បង្កើត Private GitHub Repo ហើយ Add Supervisor។', done: true },
+      { id: 2, weeks: 'សប្តាហ៍ ៣–៥', start: 10, span: 15, title: 'សរសេរ Proposal & ឡើងការពារ', desc: 'សរសេរ Proposal ១០–១៥ ទំព័រ មាន Benchmarking ៣ ប្រព័ន្ធ និងឡើង Proposal Defense សប្តាហ៍ទី ៥។', done: false },
+      { id: 3, weeks: 'សប្តាហ៍ ៦–៨', start: 25, span: 15, title: 'រចនាប្រព័ន្ធ (SDD & Figma)', desc: 'គូរ UML (Use Case, Activity, Sequence), ERD ៧ Tables ជា 3NF, និង Figma UI Prototype។', done: false },
+      { id: 4, weeks: 'សប្តាហ៍ ៩–១១', start: 40, span: 15, title: 'Sprint 1–2 (Mid-term 60% Check)', desc: 'សរសេរ Auth/RBAC, Verify គណនី, Listings CRUD, Search/Filter/Pagination បង្ហាញ Supervisor។', done: false },
+      { id: 5, weeks: 'សប្តាហ៍ ១២–១៦', start: 55, span: 25, title: 'Sprint 3–4 (បញ្ចប់ប្រព័ន្ធពេញ)', desc: 'Order Claim, Anti-Burning Verification, CO₂ Dashboard, Export PDF/Excel MISTI, Deploy Vercel/Render។', done: false },
+      { id: 6, weeks: 'សប្តាហ៍ ១៧–១៨', start: 80, span: 10, title: 'តេស្ត ៤ កម្រិត & UAT (៨–១០ នាក់)', desc: 'Unit Test (PyTest/Jest), API (Postman), OWASP Security, និង UAT ជាមួយអ្នកប្រើពិត + ពិន្ទុ SUS។', done: false },
+      { id: 7, weeks: 'សប្តាហ៍ ១៩–២០', start: 90, span: 10, title: 'សៀវភៅសារណា & Final Defense', desc: 'ឆែក Plagiarism (<20%), បោះពុម្ពសៀវភៅក្របរឹង ៣ ក្បាល, វីដេអូ Demo ៣–៥ នាទី, និងឡើងការពារ។', done: false }
+    ]
+  };
+
+  function esc(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function showToast(msg) {
+    const area = document.getElementById('toastArea');
+    const el = document.createElement('div');
+    el.className = 'toast-pop pointer-events-auto bg-[#111827] text-white text-xs sm:text-sm px-4 py-2.5 rounded-md shadow-lg max-w-sm';
+    el.textContent = msg;
+    area.appendChild(el);
+    setTimeout(() => el.remove(), 3000);
+  }
+
+  function copyText(text, msg) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => showToast(msg)).catch(() => fallbackCopy(text, msg));
+    } else {
+      fallbackCopy(text, msg);
+    }
+  }
+
+  function fallbackCopy(text, msg) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); showToast(msg); } catch (e) { showToast('សូម Copy ដោយដៃ'); }
+    document.body.removeChild(ta);
+  }
+
+  function updateReadinessBadge() {
+    let checked = 0;
+    const total = state.members.length * PREREQS.length;
+    state.members.forEach(m => PREREQS.forEach(p => { if (m.passed[p]) checked++; }));
+    const repoBonus = state.repoUrl.trim().length > 8 ? 1 : 0;
+    const pct = Math.round(((checked + repoBonus) / (total + 1)) * 100);
+    document.getElementById('readinessBadge').textContent = `FST-01 Ready: ${pct}%`;
+  }
+
+  // ---------- TAB 1: TEAM & FORM FST-01 ----------
+  function renderTeam() {
+    let passedCount = 0;
+    const totalPrereqs = state.members.length * PREREQS.length;
+    state.members.forEach(m => PREREQS.forEach(p => { if (m.passed[p]) passedCount++; }));
+
+    return `
+      <section class="bg-white border border-[#E5E2DC] rounded-lg p-5 sm:p-7 space-y-6">
+        <div class="flex flex-wrap items-start justify-between gap-4 border-b border-[#E5E2DC] pb-4">
+          <div>
+            <h2 class="text-xl sm:text-2xl font-bold text-[#111827]">ផ្នែកទី ១៖ សមាជិកក្រុមទាំង ៥ នាក់ និងលក្ខខណ្ឌ FST-01</h2>
+            <p class="text-sm text-[#4B5563] mt-1">គ្រប់សមាជិកទាំងអស់មាន GPA ≥ 3.60 តាមលក្ខខណ្ឌសាលា ACLEDA University។ ចុចធីកមុខវិជ្ជាមូលដ្ឋានខាងក្រោមដើម្បីពិនិត្យភាពរួចរាល់។</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="font-mono-code text-xs text-[#14532D] font-semibold">Prerequisites: ${passedCount}/${totalPrereqs}</span>
+            <button id="btnCheckAll" type="button" class="px-3 py-1.5 text-xs font-medium rounded border border-[#14532D] text-[#14532D] hover:bg-[#14532D] hover:text-white">ធីកជាប់ទាំងអស់</button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm border-collapse">
+            <thead>
+              <tr class="border-b border-[#111827] text-xs text-[#4B5563]">
+                <th class="py-2 pr-4">តួនាទី (Role)</th>
+                <th class="py-2 pr-4">ឈ្មោះនិស្សិត (ខ្មែរ / Latin)</th>
+                <th class="py-2 pr-4">ID &amp; GPA</th>
+                <th class="py-2">មុខវិជ្ជាមូលដ្ឋានដែលប្រឡងជាប់</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${state.members.map((m, idx) => `
+                <tr class="border-b border-[#E5E2DC]">
+                  <td class="py-3 pr-4 font-medium text-[#111827]">${esc(m.role)}</td>
+                  <td class="py-3 pr-4">
+                    <div class="font-semibold text-[#111827]">${esc(m.nameKm)}</div>
+                    <div class="text-xs text-[#4B5563]">${esc(m.nameEn)}</div>
+                  </td>
+                  <td class="py-3 pr-4 font-mono-code text-xs">
+                    <div>ID: ${esc(m.id)}</div>
+                    <div class="text-[#14532D] font-semibold">GPA: ${esc(m.gpa)}</div>
+                  </td>
+                  <td class="py-3">
+                    <div class="flex flex-wrap gap-x-3 gap-y-1.5 text-xs">
+                      ${PREREQS.map(p => `
+                        <label class="inline-flex items-center gap-1 cursor-pointer">
+                          <input type="checkbox" data-mem="${idx}" data-pre="${p}" ${m.passed[p] ? 'checked' : ''} class="accent-[#14532D]">
+                          <span>${p}</span>
+                        </label>
+                      `).join('')}
+                    </div>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pt-4 border-t border-[#E5E2DC] grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+          <div class="md:col-span-8">
+            <label class="block text-sm font-medium text-[#111827] mb-1" for="repoInput">តំណភ្ជាប់ Private GitHub Repository (សម្រាប់ដាក់ក្នុង Form FST-01)</label>
+            <input id="repoInput" type="text" placeholder="ឧ. https://github.com/ponloengbora/loopfactory-kh" value="${esc(state.repoUrl)}" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm font-mono-code">
+          </div>
+          <div class="md:col-span-4">
+            <button id="btnCopyFstSummary" type="button" class="w-full px-4 py-2 text-sm font-medium rounded-md bg-[#14532D] text-white hover:bg-[#166534]">
+              Copy ព័ត៌មានក្រុម &amp; ចំណងជើង
+            </button>
+          </div>
+        </div>
+      </section>
+    `;
+  }
+
+  // ---------- TAB 2: PROBLEM, OBJECTIVES & SCOPE ----------
+  function renderProblem() {
+    return `
+      <section class="bg-white border border-[#E5E2DC] rounded-lg p-5 sm:p-7 space-y-6">
+        <div class="flex flex-wrap items-start justify-between gap-4 border-b border-[#E5E2DC] pb-4">
+          <div>
+            <h2 class="text-xl sm:text-2xl font-bold text-[#111827]">ផ្នែកទី ២៖ បញ្ហាពិតនៅកម្ពុជា គោលបំណង និងវិសាលភាព (Scope)</h2>
+            <p class="text-sm text-[#4B5563] mt-1">ទិន្នន័យពិតឆ្នាំ ២០២៥–២០២៦ សម្រាប់យកទៅការពារពេល Proposal Defense</p>
+          </div>
+          <button id="btnCopyProblem" type="button" class="px-4 py-2 text-xs font-medium rounded-md bg-[#14532D] text-white hover:bg-[#166534]">Copy សង្ខេបបញ្ហា (ខ្មែរ)</button>
+        </div>
+
+        <!-- 4 Grounded Stats -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 pb-5 border-b border-[#E5E2DC]">
+          <div>
+            <p class="font-mono-code text-2xl sm:text-3xl font-semibold text-[#14532D]">3,386</p>
+            <p class="text-xs text-[#4B5563] mt-1">រោងចក្រឧស្សាហកម្មកំពុងដំណើរការនៅកម្ពុជា (MISTI, ២០២៦)</p>
+          </div>
+          <div>
+            <p class="font-mono-code text-2xl sm:text-3xl font-semibold text-[#111827]">179,956 t</p>
+            <p class="text-xs text-[#4B5563] mt-1">សំណល់ក្រណាត់ក្នុងមួយឆ្នាំពីវិស័យកាត់ដេរ (GIZ FABRIC / EuroCham)</p>
+          </div>
+          <div>
+            <p class="font-mono-code text-2xl sm:text-3xl font-semibold text-[#14532D]">~$20/t</p>
+            <p class="text-xs text-[#4B5563] mt-1">តម្លៃសំបកស្វាយចន្ទីសម្រាប់ Biomass នៅជនបទខ្មែរ (MDPI, ២០២៦)</p>
+          </div>
+          <div>
+            <p class="font-mono-code text-2xl sm:text-3xl font-semibold text-[#111827]">19 Dec 2029</p>
+            <p class="text-xs text-[#4B5563] mt-1">ថ្ងៃកម្ពុជាចាកចេញពី LDC ដែលទាមទារស្តង់ដារបៃតងខ្ពស់</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div class="lg:col-span-7 space-y-3 text-sm text-[#2D3748]">
+            <h3 class="text-base font-bold text-[#111827]">បញ្ហាស្នូល (Problem Statement)</h3>
+            <p>
+              រោងចក្រកាត់ដេរ និងសិប្បកម្មកែច្នៃកសិកម្មនៅខ្មែរយើងមានកាកសំណល់ស្អាតៗច្រើនណាស់ ដូចជាកម្ទេចក្រណាត់ អង្កាម និងសំបកស្វាយចន្ទី។ ប៉ុន្តែដោយសារអត់ទាន់មានប្រព័ន្ធឌីជីថលគួរឱ្យទុកចិត្តសម្រាប់ភ្ជាប់រោងចក្រជាមួយអ្នកកែច្នៃ រោងចក្រខ្លះក៏យកទៅចាក់ចោល ឬលក់ក្រៅផ្លូវការឱ្យ <strong>ឡឥដ្ឋដុតខុសច្បាប់</strong> បង្កើតផ្សែងពុល។
+            </p>
+            <p>
+              មុនពេលកម្ពុជាចាកចេញពីឋានៈ <strong>LDC នៅថ្ងៃទី ១៩ ធ្នូ ២០២៩</strong> រោងចក្រត្រូវការភស្តុតាងបញ្ជាក់ការគ្រប់គ្រងកាកសំណល់ត្រឹមត្រូវសម្រាប់អ្នកទិញអឺរ៉ុប និងពានរង្វាន់ MISTI Green Industry Awards។ ប្រព័ន្ធអន្តរជាតិដូចជា Reverse Resources ថ្លៃពេកសម្រាប់ SME ខ្មែរ ដូច្នេះហើយទើបយើងបង្កើត <strong>LoopFactory KH</strong>។
+            </p>
+
+            <h3 class="text-base font-bold text-[#111827] pt-2">គោលបំណងចម្បងទាំង ៤ (Primary Objectives)</h3>
+            <ol class="list-decimal pl-5 space-y-1.5">
+              <li>ភ្ជាប់រោងចក្រ និងសិប្បកម្មកសិកម្មខ្មែរ ជាមួយអ្នកកែច្នៃ និងសិប្បកម្មច្នៃប្រឌិតដែលបាន Verify។</li>
+              <li>ទប់ស្កាត់ការដុតក្នុងឡឥដ្ឋ តាមរយៈការ Verify គណនីដោយ Admin និងការបញ្ជាក់ការកែច្នៃ (Anti-Burning Verification)។</li>
+              <li>គណនាបរិមាណកាកសំណល់ដែលបានសង្គ្រោះ និង CO₂ ដែលបានកាត់បន្ថយដោយស្វ័យប្រវត្តិ។</li>
+              <li>អាច Export របាយការណ៍ MISTI Green Industry Compliance ជា PDF និង Excel ដោយចុចតែម្តង។</li>
+            </ol>
+          </div>
+
+          <div class="lg:col-span-5 border-t lg:border-t-0 lg:border-l border-[#E5E2DC] pt-5 lg:pt-0 lg:pl-7">
+            <div class="flex items-center justify-between gap-2 mb-4">
+              <h3 class="text-base font-bold text-[#111827]">វិសាលភាពប្រព័ន្ធ (Scope)</h3>
+              <div class="flex gap-1.5">
+                <button type="button" data-scope="in" class="pill-btn ${state.scopeView === 'in' ? 'active' : ''}">In-Scope (ធ្វើ)</button>
+                <button type="button" data-scope="out" class="pill-btn ${state.scopeView === 'out' ? 'active' : ''}">Out-of-Scope (អត់ធ្វើ)</button>
+              </div>
+            </div>
+            ${state.scopeView === 'in' ? `
+              <ul class="list-disc pl-5 space-y-2 text-sm text-[#2D3748]">
+                <li>ប្រព័ន្ធ Auth &amp; RBAC ៣ តួនាទី (Seller, Verified Buyer, Admin) ប្រើ JWT + Bcrypt/Argon2។</li>
+                <li>Database 3NF ក្នុង PostgreSQL (៧ Tables មាន Foreign Keys ពេញលេញ)។</li>
+                <li>CRUD ពេញលេញសម្រាប់ Listings, Orders, និង Verifications។</li>
+                <li>Search, Filter តាមខេត្ត/ប្រភេទ និង Pagination គ្រប់តារាងធំៗ។</li>
+                <li>Analytics Dashboard មាន Charts + Export PDF &amp; Excel។</li>
+              </ul>
+            ` : `
+              <ul class="list-disc pl-5 space-y-2 text-sm text-[#2D3748]">
+                <li><strong>មិនភ្ជាប់ Live Bank Payment Gateway៖</strong> កត់ត្រាតម្លៃព្រមព្រៀងក្នុងប្រព័ន្ធជំនួស ដើម្បីកុំឱ្យអស់ថ្លៃ API ធនាគារ។</li>
+                <li><strong>មិនធ្វើ Live Truck GPS Tracking៖</strong> ប្រើថ្ងៃណាត់ជួប និងកូដបញ្ជាក់ពេលដឹកយកជំនួសវិញ។</li>
+                <li><strong>មិនប្រើឧបករណ៍ IoT Smart Scales៖</strong> បញ្ចូលទម្ងន់ជាក់ស្តែងដោយដៃ រួមជាមួយរូបភាពបញ្ជាក់។</li>
+              </ul>
+            `}
+          </div>
+        </div>
+      </section>
+    `;
+  }
+
+  // ---------- TAB 3: BENCHMARKING ----------
+  function renderBench() {
+    const rows = [
+      { name: 'Reverse Resources (អន្តរជាតិ)', good: 'តាមដានសំណល់ក្រណាត់ពីរោងចក្រធំៗឱ្យ Brand សម្លៀកបំពាក់ពិភពលោក។', gap: 'ថ្លៃខ្លាំង (Enterprise SaaS); ធ្វើតែក្រណាត់; គ្មានភាសាខ្មែរ; អត់ជួយរោងម៉ាស៊ីនស្រូវ/ស្វាយចន្ទី។', ours: 'ថោក/ហ្វ្រីសម្រាប់ SME ខ្មែរ; មានទាំងក្រណាត់ និងកសិ-ឧស្សាហកម្ម; មាន UI ភាសាខ្មែរ។' },
+      { name: 'Excess Materials Exchange (អឺរ៉ុប)', good: 'ទីផ្សារ B2B ជួយលក់របស់សល់ពីរោងចក្រឱ្យក្លាយជាចំណូលវិញ។', gap: 'ធ្វើសម្រាប់ច្បាប់អឺរ៉ុប និងប្រាក់អឺរ៉ូ; គ្មានរបាយការណ៍ MISTI Green Industry នៅខ្មែរ។', ours: 'រចនាសម្រាប់សេដ្ឋកិច្ចខ្មែរ (USD/KHR) និង Export របាយការណ៍ MISTI/MoE ផ្ទាល់។' },
+      { name: 'ឈ្មួញក្រៅផ្លូវការ & Group Telegram', good: 'ហៅទូរស័ព្ទមកដឹកលឿន និងបង់លុយសុទ្ធភ្លាមៗ។', gap: 'អត់មាន Traceability; ហានិភ័យគេយកទៅដុតក្នុងឡឥដ្ឋ; គ្មានឯកសារសុំ Green Loan ឬនាំចេញ។', ours: 'អនុញ្ញាតតែគណនីដែល Admin បាន Verify + បញ្ជាក់មិនដុត + PDF Audit Trail។' }
+    ];
+
+    return `
+      <section class="bg-white border border-[#E5E2DC] rounded-lg p-5 sm:p-7 space-y-5">
+        <div class="flex flex-wrap items-start justify-between gap-4 border-b border-[#E5E2DC] pb-4">
+          <div>
+            <h2 class="text-xl sm:text-2xl font-bold text-[#111827]">ផ្នែកទី ៣៖ ការប្រៀបធៀបជាមួយប្រព័ន្ធ ៣ ដែលមានស្រាប់ (Benchmarking)</h2>
+            <p class="text-sm text-[#4B5563] mt-1">លក្ខខណ្ឌកាតព្វកិច្ចក្នុង FST Manual (Phase 2) ដើម្បីបង្ហាញពី Research Gap របស់ក្រុមអ្នក។</p>
+          </div>
+          <div class="flex flex-wrap gap-1.5">
+            <button type="button" data-bf="all" class="pill-btn ${state.benchFilter === 'all' ? 'active' : ''}">បង្ហាញទាំងអស់</button>
+            <button type="button" data-bf="gap" class="pill-btn ${state.benchFilter === 'gap' ? 'active' : ''}">ផ្តោតលើចំណុចខ្វះខាតនៅខ្មែរ</button>
+            <button type="button" data-bf="ours" class="pill-btn ${state.benchFilter === 'ours' ? 'active' : ''}">ផ្តោតលើចំណុចខ្លាំង LoopFactory KH</button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm border-collapse">
+            <thead>
+              <tr class="border-b border-[#111827] text-xs text-[#4B5563]">
+                <th class="py-2 pr-4">ប្រព័ន្ធដែលមានស្រាប់</th>
+                ${state.benchFilter === 'all' ? '<th class="py-2 pr-4">ចំណុចខ្លាំងរបស់គេ</th>' : ''}
+                ${state.benchFilter !== 'ours' ? '<th class="py-2 pr-4">ចំណុចខ្វះខាតនៅកម្ពុជា</th>' : ''}
+                ${state.benchFilter !== 'gap' ? '<th class="py-2">របៀបដែល LoopFactory KH ល្អជាង</th>' : ''}
+              </tr>
+            </thead>
+            <tbody>
+              ${rows.map(r => `
+                <tr class="border-b border-[#E5E2DC]">
+                  <td class="py-3.5 pr-4 font-semibold text-[#111827]">${esc(r.name)}</td>
+                  ${state.benchFilter === 'all' ? `<td class="py-3.5 pr-4 text-[#4B5563]">${esc(r.good)}</td>` : ''}
+                  ${state.benchFilter !== 'ours' ? `<td class="py-3.5 pr-4 text-[#991B1B]">${esc(r.gap)}</td>` : ''}
+                  ${state.benchFilter !== 'gap' ? `<td class="py-3.5 text-[#14532D] font-medium">${esc(r.ours)}</td>` : ''}
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    `;
+  }
+
+  // ---------- TAB 4: TECH STACK & 3NF SCHEMA ----------
+  function renderSchema() {
+    const active = state.schemaTables.find(t => t.name === state.selectedTable) || state.schemaTables[0];
+
+    return `
+      <section class="bg-white border border-[#E5E2DC] rounded-lg p-5 sm:p-7 space-y-6">
+        <div class="border-b border-[#E5E2DC] pb-4">
+          <h2 class="text-xl sm:text-2xl font-bold text-[#111827]">ផ្នែកទី ៤៖ បច្ចេកវិទ្យា $0 និងរចនាសម្ព័ន្ធ Database 3NF (៧ Tables)</h2>
+          <p class="text-sm text-[#4B5563] mt-1">ចុចលើឈ្មោះ Table ណាមួយខាងឆ្វេង ដើម្បីមើល Column, Foreign Key និងតួនាទីរបស់វា។</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pb-5 border-b border-[#E5E2DC] text-sm">
+          <div class="p-3.5 bg-[#FAF9F6] border border-[#E5E2DC] rounded-md">
+            <p class="font-mono-code text-xs text-[#14532D] font-semibold">Front-end (Host ហ្វ្រីលើ Vercel)</p>
+            <p class="font-semibold text-[#111827] mt-1">Next.js + Tailwind CSS + Recharts</p>
+          </div>
+          <div class="p-3.5 bg-[#FAF9F6] border border-[#E5E2DC] rounded-md">
+            <p class="font-mono-code text-xs text-[#14532D] font-semibold">Back-end (Host ហ្វ្រីលើ Render + Docker)</p>
+            <p class="font-semibold text-[#111827] mt-1">Python FastAPI + JWT + WeasyPrint / OpenPyXL</p>
+          </div>
+          <div class="p-3.5 bg-[#FAF9F6] border border-[#E5E2DC] rounded-md">
+            <p class="font-mono-code text-xs text-[#14532D] font-semibold">Database &amp; CI/CD ($0)</p>
+            <p class="font-semibold text-[#111827] mt-1">PostgreSQL (Supabase/Neon) + GitHub Actions</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-4 space-y-1.5">
+            ${state.schemaTables.map((t, i) => `
+              <button type="button" data-tbl="${t.name}" class="w-full text-left px-3.5 py-2.5 rounded-md border text-sm font-mono-code transition-colors ${t.name === active.name ? 'bg-[#111827] text-white border-[#111827]' : 'bg-white text-[#111827] border-[#E5E2DC] hover:bg-[#FAF9F6]'}">
+                ${i + 1}. ${t.name}
+              </button>
+            `).join('')}
+          </div>
+          <div class="lg:col-span-8 border border-[#E5E2DC] rounded-md p-5 bg-[#FAF9F6]/60">
+            <h3 class="font-mono-code text-lg font-semibold text-[#14532D]">Table: ${active.name}</h3>
+            <p class="text-sm text-[#4B5563] mt-1 mb-4">${esc(active.purpose)}</p>
+            <table class="w-full text-left text-xs sm:text-sm border-collapse">
+              <thead>
+                <tr class="border-b border-[#111827] text-[#4B5563]">
+                  <th class="py-2 pr-3">Column</th>
+                  <th class="py-2 pr-3">Type / Key</th>
+                  <th class="py-2">ការពន្យល់</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${active.cols.map(col => `
+                  <tr class="border-b border-[#E5E2DC]">
+                    <td class="py-2.5 pr-3 font-mono-code font-semibold text-[#111827]">${esc(col.c)}</td>
+                    <td class="py-2.5 pr-3 font-mono-code text-xs text-[#14532D]">${esc(col.t)}</td>
+                    <td class="py-2.5 text-[#4B5563]">${esc(col.d)}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    `;
+  }
+
+  // ---------- TAB 5: 20-WEEK GANTT ----------
+  function renderGantt() {
+    const doneCount = state.phases.filter(p => p.done).length;
+    const pct = Math.round((doneCount / state.phases.length) * 100);
+
+    return `
+      <section class="bg-white border border-[#E5E2DC] rounded-lg p-5 sm:p-7 space-y-6">
+        <div class="flex flex-wrap items-start justify-between gap-4 border-b border-[#E5E2DC] pb-4">
+          <div>
+            <h2 class="text-xl sm:text-2xl font-bold text-[#111827]">ផ្នែកទី ៥៖ កាលវិភាគអនុវត្ត ២០ សប្តាហ៍ (Interactive Gantt Chart)</h2>
+            <p class="text-sm text-[#4B5563] mt-1">ចុចធីកដំណាក់កាលដែលក្រុមអ្នកបានធ្វើរួច ដើម្បីតាមដានវឌ្ឍនភាពរហូតដល់ Final Defense សប្តាហ៍ទី ២០។</p>
+          </div>
+          <div class="text-right">
+            <span class="font-mono-code text-sm font-semibold text-[#14532D]">វឌ្ឍនភាពក្រុម៖ ${pct}% (${doneCount}/7)</span>
+            <div class="w-44 h-2 bg-[#E5E2DC] rounded-full overflow-hidden mt-1.5">
+              <div class="h-full bg-[#14532D] transition-all" style="width:${pct}%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          ${state.phases.map(p => `
+            <div class="border border-[#E5E2DC] rounded-md p-4 ${p.done ? 'bg-[#FAF9F6]' : 'bg-white'}">
+              <div class="flex flex-wrap items-start justify-between gap-2">
+                <label class="flex items-start gap-3 cursor-pointer">
+                  <input type="checkbox" data-phase="${p.id}" ${p.done ? 'checked' : ''} class="mt-1 accent-[#14532D]">
+                  <div>
+                    <span class="font-semibold text-[#111827]">${esc(p.weeks)} — ${esc(p.title)}</span>
+                    <p class="text-xs sm:text-sm text-[#4B5563] mt-0.5">${esc(p.desc)}</p>
+                  </div>
+                </label>
+                <span class="font-mono-code text-xs ${p.done ? 'text-[#14532D] font-semibold' : 'text-[#4B5563]'}">${p.done ? 'DONE' : 'UPCOMING'}</span>
+              </div>
+              <div class="mt-3 h-2.5 w-full bg-[#F2EFE9] rounded-full relative overflow-hidden">
+                <div class="h-full rounded-full ${p.done ? 'bg-[#14532D]' : 'bg-[#64748B]'}" style="margin-left:${p.start}%; width:${p.span}%;"></div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </section>
+    `;
+  }
+
+  // ---------- RENDER ----------
+  function render() {
+    const root = document.getElementById('proposalRoot');
+    if (state.activeTab === 'team') root.innerHTML = renderTeam();
+    else if (state.activeTab === 'problem') root.innerHTML = renderProblem();
+    else if (state.activeTab === 'bench') root.innerHTML = renderBench();
+    else if (state.activeTab === 'schema') root.innerHTML = renderSchema();
+    else if (state.activeTab === 'gantt') root.innerHTML = renderGantt();
+
+    document.querySelectorAll('#mainTabs button').forEach(b => {
+      b.classList.toggle('active', b.dataset.tab === state.activeTab);
+    });
+    updateReadinessBadge();
+  }
+
+  // ---------- EVENTS ----------
+  document.getElementById('mainTabs').addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-tab]');
+    if (!btn) return;
+    state.activeTab = btn.dataset.tab;
+    render();
+  });
+
+  const root = document.getElementById('proposalRoot');
+  root.addEventListener('click', (e) => {
+    if (e.target.id === 'btnCheckAll') {
+      state.members.forEach(m => PREREQS.forEach(p => { m.passed[p] = true; }));
+      showToast('បានធីកជាប់គ្រប់មុខវិជ្ជាមូលដ្ឋានទាំងអស់ (30/30)!');
+      render();
+      return;
+    }
+    if (e.target.id === 'btnCopyFstSummary') {
+      const txt = `LoopFactory KH — ACLEDA University FST Team (5 Members)\n1. Ponloeng Bora (0006580, GPA 3.87) - Project Lead\n2. Phal Raksa (0007679, GPA 3.90) - Back-end & DB\n3. Tan Mengkoung (0005957, GPA 3.80) - Front-end / QA\n4. Hak Vuttey (0007635, GPA 3.75) - Front-end / QA\n5. Chea Saroeurn (0007912, GPA 3.82) - Front-end / QA\nRepo: ${state.repoUrl || '[Pending Private GitHub URL]'}`;
+      copyText(txt, 'បាន Copy ព័ត៌មានក្រុមរួចរាល់!');
+      return;
+    }
+    if (e.target.id === 'btnCopyProblem') {
+      const txt = `LoopFactory KH — សង្ខេបបញ្ហា៖ កម្ពុជាមានរោងចក្រ 3,386 (MISTI 2026) និងសំណល់ក្រណាត់ 179,956 តោន/ឆ្នាំ (GIZ FABRIC) រួមជាមួយអង្កាម និងសំបកស្វាយចន្ទី (~$20/តោន, MDPI 2026)។ ដោយខ្វះ Platform ឌីជីថល របស់សល់ទាំងនេះត្រូវចាក់ចោល ឬដុតក្នុងឡឥដ្ឋខុសច្បាប់។ LoopFactory KH ជួយភ្ជាប់រោងចក្រជាមួយអ្នកកែច្នៃដែលបាន Verify និងចេញរបាយការណ៍ MISTI មុនថ្ងៃចាកចេញពី LDC (19 Dec 2029)។`;
+      copyText(txt, 'បាន Copy សង្ខេបបញ្ហាជាភាសាខ្មែររួចរាល់!');
+      return;
+    }
+    const scBtn = e.target.closest('button[data-scope]');
+    if (scBtn) { state.scopeView = scBtn.dataset.scope; render(); return; }
+    const bfBtn = e.target.closest('button[data-bf]');
+    if (bfBtn) { state.benchFilter = bfBtn.dataset.bf; render(); return; }
+    const tblBtn = e.target.closest('button[data-tbl]');
+    if (tblBtn) { state.selectedTable = tblBtn.dataset.tbl; render(); return; }
+  });
+
+  root.addEventListener('change', (e) => {
+    if (e.target.dataset.mem !== undefined) {
+      const m = state.members[Number(e.target.dataset.mem)];
+      if (m) m.passed[e.target.dataset.pre] = e.target.checked;
+      render();
+      return;
+    }
+    if (e.target.dataset.phase !== undefined) {
+      const ph = state.phases.find(x => x.id === Number(e.target.dataset.phase));
+      if (ph) {
+        ph.done = e.target.checked;
+        showToast(ph.done ? `បានធីកបញ្ចប់៖ ${ph.title}` : `បានដកធីក៖ ${ph.title}`);
+        render();
+      }
+    }
+  });
+
+  root.addEventListener('input', (e) => {
+    if (e.target.id === 'repoInput') {
+      state.repoUrl = e.target.value;
+      updateReadinessBadge();
+    }
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LoopFactory KH — គំរូសាកល្បងអន្តរកម្ម (ភាសាខ្មែរ)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+Khmer:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --paper: #FAF9F6;
+    --surface: #FFFFFF;
+    --ink: #111827;
+    --muted: #4B5563;
+    --hair: #E5E2DC;
+    --accent: #14532D;
+    --accent-hover: #166534;
+    --danger: #991B1B;
+    --warn: #92400E;
+  }
+  body {
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: 'Noto Sans Khmer', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.7;
+    margin: 0;
+  }
+  .font-mono-code {
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .frame-desktop {
+    max-width: 1120px;
+    margin: 0 auto;
+    transition: max-width 0.25s ease;
+  }
+  .frame-mobile {
+    max-width: 400px;
+    margin: 0 auto;
+    border: 1px solid #D6D3CD;
+    background: var(--surface);
+    padding: 14px;
+    box-shadow: 0 12px 32px rgba(17, 24, 39, 0.06);
+    transition: max-width 0.25s ease;
+  }
+  .frame-mobile .resp-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .role-tab {
+    border-bottom: 2px solid transparent;
+    color: var(--muted);
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  .role-tab:hover {
+    color: var(--ink);
+  }
+  .role-tab.active {
+    color: var(--ink);
+    border-bottom-color: var(--accent);
+    font-weight: 600;
+  }
+  .sub-btn {
+    padding: 8px 14px;
+    font-size: 0.875rem;
+    border-radius: 6px;
+    color: var(--muted);
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+  .sub-btn:hover {
+    color: var(--ink);
+    background-color: #F2EFE9;
+  }
+  .sub-btn.active {
+    background-color: var(--ink);
+    color: #FFFFFF;
+    font-weight: 500;
+  }
+  .toast-pop {
+    animation: popIn 0.2s ease-out;
+  }
+  @keyframes popIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Top Global Header -->
+  <header class="sticky top-0 z-30 bg-[#FAF9F6]/95 backdrop-blur border-b border-[#E5E2DC]">
+    <div class="max-w-[1140px] mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-[#111827]">
+          LoopFactory KH <span class="text-sm font-normal text-[#4B5563]">— ប្រព័ន្ធ B2B ផ្លាស់ប្តូរកាកសំណល់រោងចក្រ</span>
+        </h1>
+        <p class="text-xs sm:text-sm text-[#4B5563]">
+          សាកល្បងចុចប្តូរ Role ទាំង ៣ (RBAC) ខាងក្រោម ដើម្បីមើលដំណើរការប្រព័ន្ធពិតមុនពេលគូរ Figma និងសរសេរកូដ។
+        </p>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="inline-flex border border-[#E5E2DC] rounded-md bg-white p-0.5 text-xs">
+          <button id="btnDesktop" type="button" class="px-2.5 py-1.5 rounded font-medium bg-[#111827] text-white">Desktop</button>
+          <button id="btnMobile" type="button" class="px-2.5 py-1.5 rounded font-medium text-[#4B5563] hover:text-[#111827]">Mobile (390px)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RBAC Role Switcher -->
+    <nav aria-label="RBAC Roles" class="max-w-[1140px] mx-auto px-4 sm:px-6 overflow-x-auto">
+      <div id="roleNav" class="flex items-center gap-6 whitespace-nowrap text-sm">
+        <button type="button" data-role="seller" class="role-tab active py-2.5">១. រោងចក្រ / សិប្បកម្ម (Seller)</button>
+        <button type="button" data-role="buyer" class="role-tab py-2.5">២. អ្នកកែច្នៃដែលបាន Verify (Buyer)</button>
+        <button type="button" data-role="admin" class="role-tab py-2.5">៣. អ្នកគ្រប់គ្រងប្រព័ន្ធ (Compliance Admin)</button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="flex-1 px-4 sm:px-6 py-6 sm:py-8">
+    <div id="appRoot" class="frame-desktop"></div>
+  </main>
+
+  <!-- Toast Area -->
+  <div id="toastArea" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+<script>
+(function() {
+  let activeChart = null;
+
+  const state = {
+    role: 'seller',
+    viewMode: 'desktop',
+    subTab: {
+      seller: 'dashboard',
+      buyer: 'market',
+      admin: 'verify'
+    },
+    categories: [
+      { id: 'fabric', nameKm: 'កម្ទេចក្រណាត់ (Garment Offcuts)', co2Factor: 2.1 },
+      { id: 'rice', nameKm: 'អង្កាម (Rice Husks)', co2Factor: 0.9 },
+      { id: 'cashew', nameKm: 'សំបកស្វាយចន្ទី (Cashew Shells)', co2Factor: 1.2 },
+      { id: 'cardboard', nameKm: 'ក្រដាសកាតុង (Cardboard)', co2Factor: 1.5 }
+    ],
+    listings: [
+      { id: 'LF-301', factory: 'រោងចក្រកាត់ដេរ មានជ័យ', catId: 'fabric', title: 'កម្ទេចក្រណាត់កប្បាស 100% ស្អាត', kg: 450, priceUsd: 0.25, province: 'ភ្នំពេញ', status: 'AVAILABLE' },
+      { id: 'LF-302', factory: 'រោងម៉ាស៊ីនកិនស្រូវ បាត់ដំបងបៃតង', catId: 'rice', title: 'អង្កាមស្ងួតសម្រាប់ធ្វើឥន្ធនៈ Biomass', kg: 1200, priceUsd: 0.08, province: 'បាត់ដំបង', status: 'AVAILABLE' },
+      { id: 'LF-303', factory: 'សិប្បកម្មស្វាយចន្ទី កំពង់ធំ', catId: 'cashew', title: 'សំបកស្វាយចន្ទីស្អាត ($20/តោន)', kg: 800, priceUsd: 0.02, province: 'កំពង់ធំ', status: 'AVAILABLE' },
+      { id: 'LF-304', factory: 'រោងចក្រវេចខ្ចប់ ច្បារអំពៅ', catId: 'cardboard', title: 'ក្រដាសកាតុងចងជាដុំស្អាត', kg: 320, priceUsd: 0.18, province: 'ភ្នំពេញ', status: 'COMPLETED' }
+    ],
+    orders: [
+      { id: 'ORD-101', listingId: 'LF-304', title: 'ក្រដាសកាតុងចងជាដុំស្អាត', catId: 'cardboard', buyer: 'ក្រុមហ៊ុន GreenPack Recycle', kg: 320, totalUsd: 57.60, status: 'COMPLETED', reuseMethod: 'កែច្នៃជាកេសក្រដាសថ្មី', antiBurn: true },
+      { id: 'ORD-102', listingId: 'LF-301', title: 'កម្ទេចក្រណាត់កប្បាស 100% ស្អាត', catId: 'fabric', buyer: 'សិប្បកម្មច្នៃក្រណាត់ ភ្នំពេញ', kg: 200, totalUsd: 50.00, status: 'APPROVED', reuseMethod: '', antiBurn: false }
+    ],
+    buyers: [
+      { id: 'ORG-01', name: 'ក្រុមហ៊ុន GreenPack Recycle', type: 'Recycler ផ្លូវការ', province: 'ភ្នំពេញ', license: 'MOE-REC-2026-11', status: 'VERIFIED' },
+      { id: 'ORG-02', name: 'សិប្បកម្មច្នៃក្រណាត់ ភ្នំពេញ', type: 'Artisan / Upcycler', province: 'ភ្នំពេញ', license: 'SME-PP-2025-88', status: 'VERIFIED' },
+      { id: 'ORG-03', name: 'ក្រុមហ៊ុន ថាមពលជីវម៉ាស ខេត្តកំពង់ធំ', type: 'Biomass Energy SME', province: 'កំពង់ធំ', license: 'MISTI-BIO-2026-04', status: 'PENDING' },
+      { id: 'ORG-04', name: 'ឡឥដ្ឋក្រៅផ្លូវការ (គ្មានអាជ្ញាប័ណ្ណ)', type: 'គួរឱ្យសង្ស័យ (Brick Kiln)', province: 'កណ្តាល', license: 'គ្មានឯកសារ', status: 'SUSPENDED' }
+    ],
+    auditLogs: [
+      { time: '15:10', user: 'Admin', action: 'SUSPEND_ORG', detail: 'ផ្អាកគណនី ឡឥដ្ឋក្រៅផ្លូវការ ដើម្បីទប់ស្កាត់ការដុតក្រណាត់ខុសច្បាប់' },
+      { time: '15:18', user: 'GreenPack Recycle', action: 'VERIFY_REUSE', detail: 'បញ្ជាក់ការកែច្នៃ ORD-101 (320 kg ក្រដាសកាតុង) ដោយមិនដុតបំផ្លាញ' }
+    ],
+    // Form drafts
+    postForm: { factory: 'រោងចក្រកាត់ដេរ កំពង់ស្ពឺ', catId: 'fabric', title: '', kg: 300, priceUsd: 0.20, province: 'កំពង់ស្ពឺ' },
+    buyerSearch: '',
+    buyerCatFilter: 'ALL',
+    buyerProvFilter: 'ALL',
+    verifyOrderId: 'ORD-102',
+    verifyMethod: 'កែច្នៃជាកាបូប និងសម្ភារៈប្រើប្រាស់ក្នុងស្រុក',
+    verifyAntiBurn: true
+  };
+
+  function esc(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function showToast(msg) {
+    const area = document.getElementById('toastArea');
+    const el = document.createElement('div');
+    el.className = 'toast-pop pointer-events-auto bg-[#111827] text-white text-xs sm:text-sm px-4 py-2.5 rounded-md shadow-lg max-w-sm';
+    el.textContent = msg;
+    area.appendChild(el);
+    setTimeout(() => el.remove(), 3200);
+  }
+
+  function addAudit(user, action, detail) {
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    state.auditLogs.unshift({ time: `${hh}:${mm}`, user, action, detail });
+  }
+
+  function copyText(text, okMsg) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => showToast(okMsg)).catch(() => fallbackCopy(text, okMsg));
+    } else {
+      fallbackCopy(text, okMsg);
+    }
+  }
+
+  function fallbackCopy(text, okMsg) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); showToast(okMsg); } catch (e) { showToast('សូម Copy អត្ថបទដោយដៃ'); }
+    document.body.removeChild(ta);
+  }
+
+  function getCategory(id) {
+    return state.categories.find(c => c.id === id) || state.categories[0];
+  }
+
+  function calcImpact() {
+    const completed = state.orders.filter(o => o.status === 'COMPLETED');
+    const totalKg = completed.reduce((s, o) => s + o.kg, 0);
+    const totalUsd = completed.reduce((s, o) => s + o.totalUsd, 0);
+    const totalCo2 = completed.reduce((s, o) => s + (o.kg * getCategory(o.catId).co2Factor), 0);
+    const byCat = {};
+    state.categories.forEach(c => { byCat[c.id] = 0; });
+    completed.forEach(o => { byCat[o.catId] = (byCat[o.catId] || 0) + o.kg; });
+    return { totalKg, totalUsd, totalKhr: Math.round(totalUsd * 4050), totalCo2, completedCount: completed.length, byCat };
+  }
+
+  // ---------- SELLER VIEW ----------
+  function renderSeller() {
+    const sub = state.subTab.seller;
+    const imp = calcImpact();
+    const pendingOrders = state.orders.filter(o => o.status === 'PENDING').length;
+
+    const mistiReport = `របាយការណ៍អនុលោមភាពឧស្សាហកម្មបៃតង (MISTI Green Industry Compliance Summary)\nប្រព័ន្ធ: LoopFactory KH | កាលបរិច្ឆេទ: ២៣ វិច្ឆិកា ២០២៦\n--------------------------------------------------\n• បរិមាណកាកសំណល់សង្គ្រោះពីទីលានសំរាម: ${imp.totalKg.toLocaleString()} kg\n• បរិមាណកាបូនដែលបានកាត់បន្ថយ: ${imp.totalCo2.toFixed(1)} kg CO₂e\n• ចំណូលបន្ថែមពីការលក់កាកសំណល់ស្អាត: $${imp.totalUsd.toFixed(2)} (${imp.totalKhr.toLocaleString()} KHR)\n• ចំនួនប្រតិបត្តិការដែលបាន Verify មិនដុតក្នុងឡឥដ្ឋ: ${imp.completedCount} លើក\n• ស្ថានភាពត្រៀមសម្រាប់ LDC ឆ្នាំ ២០២៩: មានឯកសារ Traceability ពេញលេញ`;
+
+    return `
+      <section class="bg-white border border-[#E5E2DC] rounded-lg p-5 sm:p-7">
+        <div class="flex flex-wrap items-start justify-between gap-4 border-b border-[#E5E2DC] pb-4 mb-6">
+          <div>
+            <h2 class="text-xl sm:text-2xl font-bold text-[#111827]">ផ្ទាំងគ្រប់គ្រងរោងចក្រ និងសិប្បកម្ម (Seller Portal)</h2>
+            <p class="text-sm text-[#4B5563] mt-1">បង្ហោះកាកសំណល់ស្អាត គ្រប់គ្រងសំណើទិញ និងទាញរបាយការណ៍ MISTI Green Industry</p>
+          </div>
+          <div class="flex flex-wrap gap-1.5">
+            <button type="button" data-sub="dashboard" class="sub-btn ${sub === 'dashboard' ? 'active' : ''}">ទិដ្ឋភាពទូទៅ (Dashboard)</button>
+            <button type="button" data-sub="post" class="sub-btn ${sub === 'post' ? 'active' : ''}">បង្ហោះកាកសំណល់ថ្មី</button>
+            <button type="button" data-sub="orders" class="sub-btn ${sub === 'orders' ? 'active' : ''}">សំណើទិញ (${pendingOrders} រង់ចាំ)</button>
+            <button type="button" data-sub="report" class="sub-btn ${sub === 'report' ? 'active' : ''}">របាយការណ៍ MISTI</button>
+          </div>
+        </div>
+
+        <!-- KPI Strip -->
+        <div class="resp-grid grid grid-cols-1 sm:grid-cols-3 gap-6 pb-6 mb-6 border-b border-[#E5E2DC]">
+          <div>
+            <p class="text-xs text-[#4B5563]">កាកសំណល់បានសង្គ្រោះ (Verified)</p>
+            <p class="font-mono-code text-3xl font-semibold text-[#14532D] mt-1">${imp.totalKg.toLocaleString()} kg</p>
+            <p class="text-xs text-[#4B5563] mt-0.5">មិនបាច់ចាក់ចោល ឬដុតខុសច្បាប់</p>
+          </div>
+          <div>
+            <p class="text-xs text-[#4B5563]">បរិមាណ CO₂ ដែលបានកាត់បន្ថយ</p>
+            <p class="font-mono-code text-3xl font-semibold text-[#111827] mt-1">${imp.totalCo2.toFixed(1)} kg</p>
+            <p class="text-xs text-[#4B5563] mt-0.5">គណនាតាម Emission Factor ក្នុង Database</p>
+          </div>
+          <div>
+            <p class="text-xs text-[#4B5563]">ចំណូលបន្ថែមពីកាកសំណល់</p>
+            <p class="font-mono-code text-3xl font-semibold text-[#14532D] mt-1">$${imp.totalUsd.toFixed(2)}</p>
+            <p class="text-xs font-mono-code text-[#4B5563] mt-0.5">${imp.totalKhr.toLocaleString()} KHR</p>
+          </div>
+        </div>
+
+        ${sub === 'dashboard' ? `
+          <div class="resp-grid grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-7">
+              <p class="text-sm font-semibold text-[#111827] mb-3">ក្រាហ្វបង្ហាញបរិមាណកាកសំណល់ដែលបានកែច្នៃតាមប្រភេទ (kg)</p>
+              <div class="relative h-64 border border-[#E5E2DC] rounded-md p-3 bg-[#FAF9F6]">
+                <canvas id="impactChart"></canvas>
+              </div>
+              <p class="text-xs text-[#4B5563] mt-2">គន្លឹះសាកល្បង៖ ចូលទៅ Role ទី ២ (Buyer) ហើយចុច "បញ្ជាក់ការកែច្នៃរួចរាល់" ដើម្បីឃើញក្រាហ្វនេះឡើងភ្លាមៗ!</p>
+            </div>
+            <div class="lg:col-span-5">
+              <p class="text-sm font-semibold text-[#111827] mb-3">បញ្ជីកាកសំណល់ដែលកំពុងបង្ហោះ (${state.listings.length})</p>
+              <div class="space-y-2.5">
+                ${state.listings.slice(0, 5).map(l => `
+                  <div class="p-3 border border-[#E5E2DC] rounded-md bg-[#FAF9F6]/60 text-sm">
+                    <div class="flex justify-between gap-2">
+                      <span class="font-semibold text-[#111827]">${esc(l.title)}</span>
+                      <span class="font-mono-code text-xs ${l.status === 'AVAILABLE' ? 'text-[#14532D]' : 'text-[#4B5563]'}">${l.status}</span>
+                    </div>
+                    <p class="text-xs text-[#4B5563] mt-1">${esc(l.factory)} · ${esc(l.province)} · <span class="font-mono-code">${l.kg} kg ($${l.priceUsd.toFixed(2)}/kg)</span></p>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        ` : sub === 'post' ? `
+          <div class="max-w-xl space-y-4">
+            <p class="text-sm text-[#4B5563]">បំពេញព័ត៌មានខាងក្រោមដើម្បីបង្ហោះកាកសំណល់ស្អាតទៅលើទីផ្សារ B2B៖</p>
+            <div>
+              <label class="block text-sm font-medium mb-1" for="pFactory">ឈ្មោះរោងចក្រ / សិប្បកម្ម</label>
+              <input id="pFactory" type="text" value="${esc(state.postForm.factory)}" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm">
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium mb-1" for="pCat">ប្រភេទកាកសំណល់</label>
+                <select id="pCat" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm bg-white">
+                  ${state.categories.map(c => `<option value="${c.id}" ${state.postForm.catId === c.id ? 'selected' : ''}>${esc(c.nameKm)}</option>`).join('')}
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1" for="pProv">ខេត្ត / រាជធានី</label>
+                <select id="pProv" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm bg-white">
+                  ${['ភ្នំពេញ', 'កំពង់ស្ពឺ', 'បាត់ដំបង', 'កំពង់ធំ', 'កណ្តាល'].map(p => `<option ${state.postForm.province === p ? 'selected' : ''}>${p}</option>`).join('')}
+                </select>
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1" for="pTitle">ការពិពណ៌នាវត្ថុធាតុ</label>
+              <input id="pTitle" type="text" placeholder="ឧ. កម្ទេចក្រណាត់ខោខូវប៊យស្អាត" value="${esc(state.postForm.title)}" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm">
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium mb-1" for="pKg">ទម្ងន់សរុប (kg)</label>
+                <input id="pKg" type="number" min="10" step="10" value="${state.postForm.kg}" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm font-mono-code">
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1" for="pPrice">តម្លៃ (USD / kg)</label>
+                <input id="pPrice" type="number" min="0.01" step="0.01" value="${state.postForm.priceUsd}" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm font-mono-code">
+              </div>
+            </div>
+            <button id="btnPostListing" type="button" class="px-5 py-2.5 text-sm font-medium rounded-md bg-[#14532D] text-white hover:bg-[#166534]">
+              បង្ហោះចូលទីផ្សារ LoopFactory KH
+            </button>
+          </div>
+        ` : sub === 'orders' ? `
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm border-collapse">
+              <thead>
+                <tr class="border-b border-[#111827] text-xs text-[#4B5563]">
+                  <th class="py-2 pr-4">លេខកូដ</th>
+                  <th class="py-2 pr-4">វត្ថុធាតុ</th>
+                  <th class="py-2 pr-4">អ្នកទិញ (Verified)</th>
+                  <th class="py-2 pr-4">ទម្ងន់ / តម្លៃ</th>
+                  <th class="py-2 pr-4">ស្ថានភាព</th>
+                  <th class="py-2">សកម្មភាព</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${state.orders.map(o => `
+                  <tr class="border-b border-[#E5E2DC]">
+                    <td class="py-3 pr-4 font-mono-code text-xs">${esc(o.id)}</td>
+                    <td class="py-3 pr-4 font-medium">${esc(o.title)}</td>
+                    <td class="py-3 pr-4 text-[#4B5563]">${esc(o.buyer)}</td>
+                    <td class="py-3 pr-4 font-mono-code text-xs">${o.kg} kg · $${o.totalUsd.toFixed(2)}</td>
+                    <td class="py-3 pr-4 font-mono-code text-xs font-semibold ${o.status === 'COMPLETED' ? 'text-[#14532D]' : o.status === 'PENDING' ? 'text-[#92400E]' : 'text-[#111827]'}">${o.status}</td>
+                    <td class="py-3">
+                      ${o.status === 'PENDING' ? `
+                        <button type="button" data-approve-order="${o.id}" class="px-3 py-1 text-xs rounded bg-[#14532D] text-white hover:bg-[#166534]">អនុម័ត (Approve)</button>
+                      ` : `<span class="text-xs text-[#4B5563]">${o.status === 'COMPLETED' ? 'បានបញ្ជាក់កែច្នៃរួច' : 'រង់ចាំអ្នកទិញបញ្ជាក់'}</span>`}
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        ` : `
+          <div class="space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <p class="text-sm text-[#4B5563]">របាយការណ៍សង្ខេបសម្រាប់ដាក់ជូនក្រសួង MISTI Green Industry Awards និងអ្នកទិញអឺរ៉ុប៖</p>
+              <button id="btnCopyMisti" type="button" class="px-4 py-2 text-xs font-medium rounded-md bg-[#14532D] text-white hover:bg-[#166534]">Copy របាយការណ៍ MISTI</button>
+            </div>
+            <pre class="bg-[#FAF9F6] border border-[#E5E2DC] rounded-md p-4 text-xs sm:text-sm whitespace-pre-wrap leading-relaxed text-[#111827]">${esc(mistiReport)}</pre>
+          </div>
+        `}
+      </section>
+    `;
+  }
+
+  // ---------- BUYER VIEW ----------
+  function renderBuyer() {
+    const sub = state.subTab.buyer;
+    const q = state.buyerSearch.trim().toLowerCase();
+    const filtered = state.listings.filter(l => {
+      if (state.buyerCatFilter !== 'ALL' && l.catId !== state.buyerCatFilter) return false;
+      if (state.buyerProvFilter !== 'ALL' && l.province !== state.buyerProvFilter) return false;
+      if (q && !(l.title.toLowerCase().includes(q) || l.factory.toLowerCase().includes(q))) return false;
+      return true;
+    });
+    const approvedOrders = state.orders.filter(o => o.status === 'APPROVED');
+
+    return `
+      <section class="bg-white border border-[#E5E2DC] rounded-lg p-5 sm:p-7">
+        <div class="flex flex-wrap items-start justify-between gap-4 border-b border-[#E5E2DC] pb-4 mb-6">
+          <div>
+            <h2 class="text-xl sm:text-2xl font-bold text-[#111827]">ផ្ទាំងអ្នកកែច្នៃ និងសិប្បកម្មច្នៃប្រឌិត (Verified Buyer)</h2>
+            <p class="text-sm text-[#4B5563] mt-1">ស្វែងរកទិញកាកសំណល់ស្អាតតាមខេត្ត និងបញ្ជាក់ការកែច្នៃដោយមិនដុតក្នុងឡឥដ្ឋ</p>
+          </div>
+          <div class="flex flex-wrap gap-1.5">
+            <button type="button" data-sub="market" class="sub-btn ${sub === 'market' ? 'active' : ''}">ទីផ្សារ B2B (${filtered.length})</button>
+            <button type="button" data-sub="verify" class="sub-btn ${sub === 'verify' ? 'active' : ''}">បញ្ជាក់ការកែច្នៃ (${approvedOrders.length})</button>
+          </div>
+        </div>
+
+        ${sub === 'market' ? `
+          <div class="resp-grid grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+            <input id="bSearch" type="text" placeholder="ស្វែងរកឈ្មោះវត្ថុធាតុ ឬរោងចក្រ..." value="${esc(state.buyerSearch)}" class="px-3 py-2 border border-[#E5E2DC] rounded-md text-sm">
+            <select id="bCat" class="px-3 py-2 border border-[#E5E2DC] rounded-md text-sm bg-white">
+              <option value="ALL" ${state.buyerCatFilter === 'ALL' ? 'selected' : ''}>គ្រប់ប្រភេទកាកសំណល់</option>
+              ${state.categories.map(c => `<option value="${c.id}" ${state.buyerCatFilter === c.id ? 'selected' : ''}>${esc(c.nameKm)}</option>`).join('')}
+            </select>
+            <select id="bProv" class="px-3 py-2 border border-[#E5E2DC] rounded-md text-sm bg-white">
+              <option value="ALL" ${state.buyerProvFilter === 'ALL' ? 'selected' : ''}>គ្រប់ខេត្ត / រាជធានី</option>
+              ${['ភ្នំពេញ', 'កំពង់ស្ពឺ', 'បាត់ដំបង', 'កំពង់ធំ', 'កណ្តាល'].map(p => `<option value="${p}" ${state.buyerProvFilter === p ? 'selected' : ''}>${p}</option>`).join('')}
+            </select>
+          </div>
+
+          <div class="resp-grid grid grid-cols-1 md:grid-cols-2 gap-4">
+            ${filtered.length === 0 ? `<p class="text-sm text-[#4B5563]">រកមិនឃើញកាកសំណល់តាមលក្ខខណ្ឌនេះទេ។</p>` : filtered.map(l => `
+              <div class="border border-[#E5E2DC] rounded-md p-4 flex flex-col justify-between bg-[#FAF9F6]/50">
+                <div>
+                  <div class="flex justify-between items-start gap-2">
+                    <h3 class="font-semibold text-[#111827]">${esc(l.title)}</h3>
+                    <span class="font-mono-code text-xs ${l.status === 'AVAILABLE' ? 'text-[#14532D] font-semibold' : 'text-[#4B5563]'}">${l.status}</span>
+                  </div>
+                  <p class="text-xs text-[#4B5563] mt-1">${esc(l.factory)} · ${esc(l.province)}</p>
+                  <div class="flex flex-wrap gap-4 mt-3 text-xs font-mono-code text-[#111827]">
+                    <span>ទម្ងន់: ${l.kg} kg</span>
+                    <span>តម្លៃ: $${l.priceUsd.toFixed(2)}/kg</span>
+                    <span>សរុប: $${(l.kg * l.priceUsd).toFixed(2)}</span>
+                  </div>
+                </div>
+                <div class="mt-4 pt-3 border-t border-[#E5E2DC]">
+                  <button type="button" data-claim-id="${l.id}" ${l.status !== 'AVAILABLE' ? 'disabled' : ''} class="w-full px-3 py-2 text-xs font-medium rounded ${l.status !== 'AVAILABLE' ? 'bg-[#E5E2DC] text-[#4B5563] cursor-not-allowed' : 'bg-[#14532D] text-white hover:bg-[#166534]'}">
+                    ${l.status !== 'AVAILABLE' ? 'មានអ្នកស្នើទិញរួចហើយ' : 'ស្នើសុំទិញយកទៅកែច្នៃ (Claim Batch)'}
+                  </button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        ` : `
+          <div class="max-w-xl space-y-4">
+            ${approvedOrders.length === 0 ? `
+              <p class="text-sm text-[#4B5563]">មិនមាន Order ដែលកំពុងរង់ចាំការបញ្ជាក់ទេ។ សូមចុច "ស្នើសុំទិញ" នៅទីផ្សារ B2B ហើយចូល Role Seller ដើម្បី Approve សិន!</p>
+            ` : `
+              <p class="text-sm text-[#4B5563]">ជំហានក្រមសីលធម៌ (Anti-Burning Verification)៖ បញ្ជាក់ការយកទៅកែច្នៃពិតប្រាកដ ដើម្បីបង្កើនពិន្ទុ CO₂ ឱ្យរោងចក្រ។</p>
+              <div>
+                <label class="block text-sm font-medium mb-1" for="vOrder">ជ្រើសរើស Order ដែលបានដឹកយក</label>
+                <select id="vOrder" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm bg-white">
+                  ${approvedOrders.map(o => `<option value="${o.id}" ${state.verifyOrderId === o.id ? 'selected' : ''}>${o.id} — ${esc(o.title)} (${o.kg} kg)</option>`).join('')}
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1" for="vMethod">វិធីសាស្ត្រកែច្នៃ (Reuse Method)</label>
+                <input id="vMethod" type="text" value="${esc(state.verifyMethod)}" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm">
+              </div>
+              <label class="flex items-start gap-2.5 text-sm cursor-pointer pt-1">
+                <input id="vAntiBurn" type="checkbox" ${state.verifyAntiBurn ? 'checked' : ''} class="mt-1 accent-[#14532D]">
+                <span><strong>កិច្ចសន្យាការពារបរិស្ថាន៖</strong> ខ្ញុំសូមបញ្ជាក់ថា វត្ថុធាតុនេះត្រូវបានយកទៅកែច្នៃត្រឹមត្រូវ មិនយកទៅដុតក្នុងឡឥដ្ឋ ឬចាក់ចោលខុសច្បាប់ឡើយ។</span>
+              </label>
+              <button id="btnConfirmReuse" type="button" class="px-5 py-2.5 text-sm font-medium rounded-md bg-[#14532D] text-white hover:bg-[#166534]">
+                បញ្ជាក់ការកែច្នៃរួចរាល់ (Complete &amp; Update CO₂)
+              </button>
+            `}
+          </div>
+        `}
+      </section>
+    `;
+  }
+
+  // ---------- ADMIN VIEW ----------
+  function renderAdmin() {
+    const sub = state.subTab.admin;
+
+    return `
+      <section class="bg-white border border-[#E5E2DC] rounded-lg p-5 sm:p-7">
+        <div class="flex flex-wrap items-start justify-between gap-4 border-b border-[#E5E2DC] pb-4 mb-6">
+          <div>
+            <h2 class="text-xl sm:text-2xl font-bold text-[#111827]">ផ្ទាំងអ្នកគ្រប់គ្រងក្រមសីលធម៌ (Compliance Admin)</h2>
+            <p class="text-sm text-[#4B5563] mt-1">ផ្ទៀងផ្ទាត់អាជ្ញាប័ណ្ណអ្នកទិញ ទប់ស្កាត់ឡឥដ្ឋខុសច្បាប់ កែតម្លៃ CO₂ និងមើល Audit Logs</p>
+          </div>
+          <div class="flex flex-wrap gap-1.5">
+            <button type="button" data-sub="verify" class="sub-btn ${sub === 'verify' ? 'active' : ''}">ផ្ទៀងផ្ទាត់អ្នកទិញ (${state.buyers.length})</button>
+            <button type="button" data-sub="factors" class="sub-btn ${sub === 'factors' ? 'active' : ''}">កត្តាគណនា CO₂</button>
+            <button type="button" data-sub="logs" class="sub-btn ${sub === 'logs' ? 'active' : ''}">Audit Logs (${state.auditLogs.length})</button>
+          </div>
+        </div>
+
+        ${sub === 'verify' ? `
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm border-collapse">
+              <thead>
+                <tr class="border-b border-[#111827] text-xs text-[#4B5563]">
+                  <th class="py-2 pr-4">ឈ្មោះអង្គភាព / ក្រុមហ៊ុន</th>
+                  <th class="py-2 pr-4">ប្រភេទ</th>
+                  <th class="py-2 pr-4">អាជ្ញាប័ណ្ណ</th>
+                  <th class="py-2 pr-4">ស្ថានភាព</th>
+                  <th class="py-2">សកម្មភាព</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${state.buyers.map(b => `
+                  <tr class="border-b border-[#E5E2DC]">
+                    <td class="py-3 pr-4 font-medium">${esc(b.name)}</td>
+                    <td class="py-3 pr-4 text-[#4B5563]">${esc(b.type)}</td>
+                    <td class="py-3 pr-4 font-mono-code text-xs">${esc(b.license)}</td>
+                    <td class="py-3 pr-4 font-mono-code text-xs font-semibold ${b.status === 'VERIFIED' ? 'text-[#14532D]' : b.status === 'SUSPENDED' ? 'text-[#991B1B]' : 'text-[#92400E]'}">${b.status}</td>
+                    <td class="py-3">
+                      <button type="button" data-toggle-buyer="${b.id}" class="px-3 py-1 text-xs rounded border ${b.status === 'VERIFIED' ? 'border-[#991B1B] text-[#991B1B] hover:bg-[#991B1B] hover:text-white' : 'border-[#14532D] text-[#14532D] hover:bg-[#14532D] hover:text-white'}">
+                        ${b.status === 'VERIFIED' ? 'ផ្អាក (Suspend)' : 'អនុម័ត (Verify)'}
+                      </button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        ` : sub === 'factors' ? `
+          <div class="max-w-lg space-y-4">
+            <p class="text-sm text-[#4B5563]">កែតម្លៃ Emission Factor (kg CO₂e ដែលសង្គ្រោះបានក្នុង ១ kg កាកសំណល់) ក្នុង Table <code>material_categories</code>៖</p>
+            ${state.categories.map(c => `
+              <div class="flex items-center justify-between gap-4 py-2 border-b border-[#E5E2DC]">
+                <label class="text-sm font-medium text-[#111827]" for="fac_${c.id}">${esc(c.nameKm)}</label>
+                <div class="flex items-center gap-2">
+                  <input id="fac_${c.id}" data-cat-factor="${c.id}" type="number" step="0.1" min="0.1" value="${c.co2Factor}" class="w-24 px-2.5 py-1.5 border border-[#E5E2DC] rounded text-sm font-mono-code text-right">
+                  <span class="text-xs font-mono-code text-[#4B5563]">kg CO₂e</span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        ` : `
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm border-collapse">
+              <thead>
+                <tr class="border-b border-[#111827] text-xs text-[#4B5563]">
+                  <th class="py-2 pr-4">ម៉ោង</th>
+                  <th class="py-2 pr-4">អ្នកប្រើប្រាស់</th>
+                  <th class="py-2 pr-4">Action</th>
+                  <th class="py-2">ព័ត៌មានលម្អិត</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${state.auditLogs.map(log => `
+                  <tr class="border-b border-[#E5E2DC]">
+                    <td class="py-2.5 pr-4 font-mono-code text-xs text-[#4B5563]">${esc(log.time)}</td>
+                    <td class="py-2.5 pr-4 font-medium">${esc(log.user)}</td>
+                    <td class="py-2.5 pr-4 font-mono-code text-xs text-[#14532D]">${esc(log.action)}</td>
+                    <td class="py-2.5 text-[#4B5563]">${esc(log.detail)}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `}
+      </section>
+    `;
+  }
+
+  // ---------- RENDER ----------
+  function renderChart() {
+    const canvas = document.getElementById('impactChart');
+    if (!canvas || typeof Chart === 'undefined') return;
+    if (activeChart) {
+      activeChart.destroy();
+      activeChart = null;
+    }
+    const imp = calcImpact();
+    const labels = state.categories.map(c => c.nameKm.split(' (')[0]);
+    const values = state.categories.map(c => imp.byCat[c.id] || 0);
+
+    activeChart = new Chart(canvas.getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: 'កាកសំណល់ដែលបានសង្គ្រោះ (kg)',
+          data: values,
+          backgroundColor: '#14532D',
+          borderRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: { beginAtZero: true, grid: { color: '#E5E2DC' } },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  function render() {
+    const root = document.getElementById('appRoot');
+    root.className = state.viewMode === 'mobile' ? 'frame-mobile' : 'frame-desktop';
+
+    if (state.role === 'seller') root.innerHTML = renderSeller();
+    else if (state.role === 'buyer') root.innerHTML = renderBuyer();
+    else root.innerHTML = renderAdmin();
+
+    document.querySelectorAll('#roleNav button').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.role === state.role);
+    });
+
+    if (state.role === 'seller' && state.subTab.seller === 'dashboard') {
+      renderChart();
+    }
+  }
+
+  // ---------- EVENTS ----------
+  document.getElementById('roleNav').addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-role]');
+    if (!btn) return;
+    state.role = btn.dataset.role;
+    render();
+  });
+
+  document.getElementById('btnDesktop').addEventListener('click', () => {
+    state.viewMode = 'desktop';
+    document.getElementById('btnDesktop').className = 'px-2.5 py-1.5 rounded font-medium bg-[#111827] text-white';
+    document.getElementById('btnMobile').className = 'px-2.5 py-1.5 rounded font-medium text-[#4B5563] hover:text-[#111827]';
+    render();
+  });
+
+  document.getElementById('btnMobile').addEventListener('click', () => {
+    state.viewMode = 'mobile';
+    document.getElementById('btnMobile').className = 'px-2.5 py-1.5 rounded font-medium bg-[#111827] text-white';
+    document.getElementById('btnDesktop').className = 'px-2.5 py-1.5 rounded font-medium text-[#4B5563] hover:text-[#111827]';
+    render();
+  });
+
+  const root = document.getElementById('appRoot');
+
+  root.addEventListener('click', (e) => {
+    const subBtn = e.target.closest('button[data-sub]');
+    if (subBtn) {
+      state.subTab[state.role] = subBtn.dataset.sub;
+      render();
+      return;
+    }
+
+    if (e.target.id === 'btnPostListing') {
+      const f = state.postForm;
+      const id = 'LF-' + (301 + state.listings.length);
+      const title = f.title.trim() || 'កាកសំណល់ស្អាតពីរោងចក្រ';
+      state.listings.unshift({
+        id,
+        factory: f.factory.trim() || 'រោងចក្រ SME កម្ពុជា',
+        catId: f.catId,
+        title,
+        kg: Math.max(10, Number(f.kg) || 100),
+        priceUsd: Math.max(0.01, Number(f.priceUsd) || 0.10),
+        province: f.province,
+        status: 'AVAILABLE'
+      });
+      f.title = '';
+      addAudit('Seller', 'POST_LISTING', `បង្ហោះ ${id}: ${title}`);
+      state.subTab.seller = 'dashboard';
+      showToast(`បានបង្ហោះ ${id} ចូលទីផ្សារ LoopFactory KH ដោយជោគជ័យ!`);
+      render();
+      return;
+    }
+
+    const appBtn = e.target.closest('button[data-approve-order]');
+    if (appBtn) {
+      const ord = state.orders.find(o => o.id === appBtn.dataset.approveOrder);
+      if (ord) {
+        ord.status = 'APPROVED';
+        state.verifyOrderId = ord.id;
+        addAudit('Seller', 'APPROVE_ORDER', `អនុម័តសំណើទិញ ${ord.id}`);
+        showToast(`បានអនុម័ត ${ord.id} — ឥឡូវ Buyer អាចចូលបញ្ជាក់ការកែច្នៃបាន!`);
+        render();
+      }
+      return;
+    }
+
+    if (e.target.id === 'btnCopyMisti') {
+      const pre = root.querySelector('pre');
+      if (pre) copyText(pre.textContent, 'បាន Copy របាយការណ៍ MISTI រួចរាល់!');
+      return;
+    }
+
+    const claimBtn = e.target.closest('button[data-claim-id]');
+    if (claimBtn) {
+      const item = state.listings.find(l => l.id === claimBtn.dataset.claimId);
+      if (item && item.status === 'AVAILABLE') {
+        item.status = 'CLAIMED';
+        const ordId = 'ORD-' + (101 + state.orders.length);
+        state.orders.unshift({
+          id: ordId,
+          listingId: item.id,
+          title: item.title,
+          catId: item.catId,
+          buyer: 'សិប្បកម្មច្នៃក្រណាត់ ភ្នំពេញ',
+          kg: item.kg,
+          totalUsd: Number((item.kg * item.priceUsd).toFixed(2)),
+          status: 'PENDING',
+          reuseMethod: '',
+          antiBurn: false
+        });
+        addAudit('Buyer', 'CLAIM_BATCH', `ស្នើទិញ ${item.id} (${item.kg} kg)`);
+        showToast(`បានផ្ញើសំណើ ${ordId}! ចូល Role ១ (Seller) ដើម្បីចុច Approve។`);
+        render();
+      }
+      return;
+    }
+
+    if (e.target.id === 'btnConfirmReuse') {
+      if (!state.verifyAntiBurn) {
+        showToast('សូមចុចធីកបញ្ជាក់កិច្ចសន្យាការពារបរិស្ថាន (Anti-Burning) ជាមុនសិន!');
+        return;
+      }
+      const ord = state.orders.find(o => o.id === state.verifyOrderId && o.status === 'APPROVED') || state.orders.find(o => o.status === 'APPROVED');
+      if (ord) {
+        ord.status = 'COMPLETED';
+        ord.antiBurn = true;
+        ord.reuseMethod = state.verifyMethod;
+        const lst = state.listings.find(l => l.id === ord.listingId);
+        if (lst) lst.status = 'COMPLETED';
+        addAudit('Buyer', 'VERIFY_REUSE', `បញ្ជាក់ការកែច្នៃ ${ord.id} (${ord.kg} kg) មិនដុតក្នុងឡឥដ្ឋ`);
+        showToast(`ជោគជ័យ! បានបូកបន្ថែម ${ord.kg} kg លើ Dashboard CO₂ របស់រោងចក្រ!`);
+        render();
+      }
+      return;
+    }
+
+    const togBtn = e.target.closest('button[data-toggle-buyer]');
+    if (togBtn) {
+      const b = state.buyers.find(x => x.id === togBtn.dataset.toggleBuyer);
+      if (b) {
+        b.status = b.status === 'VERIFIED' ? 'SUSPENDED' : 'VERIFIED';
+        addAudit('Admin', b.status === 'VERIFIED' ? 'VERIFY_ORG' : 'SUSPEND_ORG', `ប្តូរស្ថានភាព ${b.name} ទៅជា ${b.status}`);
+        showToast(`បានប្តូរស្ថានភាព ${b.name} ទៅជា ${b.status}`);
+        render();
+      }
+    }
+  });
+
+  root.addEventListener('input', (e) => {
+    const id = e.target.id;
+    const val = e.target.value;
+    if (id === 'pFactory') state.postForm.factory = val;
+    else if (id === 'pTitle') state.postForm.title = val;
+    else if (id === 'pKg') state.postForm.kg = Number(val) || 0;
+    else if (id === 'pPrice') state.postForm.priceUsd = Number(val) || 0;
+    else if (id === 'bSearch') { state.buyerSearch = val; render(); }
+    else if (id === 'vMethod') state.verifyMethod = val;
+    else if (e.target.dataset.catFactor) {
+      const cat = state.categories.find(c => c.id === e.target.dataset.catFactor);
+      if (cat) cat.co2Factor = Math.max(0.1, Number(val) || 0.1);
+    }
+  });
+
+  root.addEventListener('change', (e) => {
+    const id = e.target.id;
+    if (id === 'pCat') state.postForm.catId = e.target.value;
+    else if (id === 'pProv') state.postForm.province = e.target.value;
+    else if (id === 'bCat') { state.buyerCatFilter = e.target.value; render(); }
+    else if (id === 'bProv') { state.buyerProvFilter = e.target.value; render(); }
+    else if (id === 'vOrder') state.verifyOrderId = e.target.value;
+    else if (id === 'vAntiBurn') state.verifyAntiBurn = e.target.checked;
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

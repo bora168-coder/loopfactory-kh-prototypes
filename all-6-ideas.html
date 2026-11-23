@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cambodia Thesis Interactive Prototypes — 6 Clickable Web Apps</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<style>
+  :root {
+    --paper: #FAF9F6;
+    --surface: #FFFFFF;
+    --ink: #111827;
+    --ink-muted: #4B5563;
+    --hair: #E5E2DC;
+    --accent: #14532D;
+    --accent-hover: #166534;
+    --amber: #92400E;
+    --red: #991B1B;
+  }
+  body {
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    margin: 0;
+  }
+  .font-serif-editorial {
+    font-family: 'Newsreader', Georgia, serif;
+  }
+  .font-mono-code {
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .frame-desktop {
+    max-width: 1120px;
+    margin: 0 auto;
+    transition: max-width 0.25s ease;
+  }
+  .frame-mobile {
+    max-width: 400px;
+    margin: 0 auto;
+    border: 1px solid #D6D3CD;
+    background: var(--surface);
+    padding: 16px;
+    box-shadow: 0 12px 32px rgba(17, 24, 39, 0.06);
+    transition: max-width 0.25s ease;
+  }
+  .frame-mobile .responsive-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .tab-btn {
+    border-bottom: 2px solid transparent;
+    color: var(--ink-muted);
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  .tab-btn:hover {
+    color: var(--ink);
+  }
+  .tab-btn.active {
+    color: var(--ink);
+    border-bottom-color: var(--accent);
+    font-weight: 600;
+  }
+  .subtab-btn {
+    padding: 8px 14px;
+    font-size: 0.875rem;
+    border-radius: 6px;
+    color: var(--ink-muted);
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+  .subtab-btn:hover {
+    color: var(--ink);
+    background-color: #F2EFE9;
+  }
+  .subtab-btn.active {
+    background-color: var(--ink);
+    color: #FFFFFF;
+    font-weight: 500;
+  }
+  input[type="range"] {
+    accent-color: #14532D;
+  }
+  .toast-enter {
+    animation: fadeUp 0.2s ease-out;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Top Global Bar -->
+  <header class="sticky top-0 z-30 bg-[#FAF9F6]/95 backdrop-blur border-b border-[#E5E2DC]">
+    <div class="max-w-[1160px] mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <h1 class="font-serif-editorial text-xl sm:text-2xl font-medium tracking-tight text-[#111827]">
+          Cambodia Thesis Prototypes
+        </h1>
+        <p class="text-xs sm:text-sm text-[#4B5563]">
+          Click any idea below to test its real screens (គំរូសាកល្បងដែលអាចចុចបាន) before building in Figma.
+        </p>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="inline-flex border border-[#E5E2DC] rounded-md bg-white p-0.5 text-xs">
+          <button id="btnViewDesktop" type="button" class="px-2.5 py-1.5 rounded font-medium bg-[#111827] text-white">
+            Desktop
+          </button>
+          <button id="btnViewMobile" type="button" class="px-2.5 py-1.5 rounded font-medium text-[#4B5563] hover:text-[#111827]">
+            Mobile (390px)
+          </button>
+        </div>
+        <button id="btnOpenFigmaModal" type="button" class="px-3 py-1.5 text-xs sm:text-sm font-medium rounded-md border border-[#14532D] text-[#14532D] bg-white hover:bg-[#14532D] hover:text-white transition-colors">
+          How to Import to Figma
+        </button>
+      </div>
+    </div>
+
+    <!-- Prototype Switcher Navigation -->
+    <nav aria-label="Thesis Ideas" class="max-w-[1160px] mx-auto px-4 sm:px-6 overflow-x-auto">
+      <div id="ideaNav" class="flex items-center gap-5 whitespace-nowrap text-sm">
+        <button type="button" data-idea="greenlight" class="tab-btn active py-2.5">1. GreenLight KH</button>
+        <button type="button" data-idea="eprlink" class="tab-btn py-2.5">2. EPR-Link KH</button>
+        <button type="button" data-idea="traceforest" class="tab-btn py-2.5">3. TraceForest KH</button>
+        <button type="button" data-idea="fairdebt" class="tab-btn py-2.5">4. FairDebt KH</button>
+        <button type="button" data-idea="ecoledger" class="tab-btn py-2.5">5. EcoLedger KH</button>
+        <button type="button" data-idea="loopfactory" class="tab-btn py-2.5">6. LoopFactory KH</button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main Interactive Prototype Workspace -->
+  <main class="flex-1 px-4 sm:px-6 py-6 sm:py-8">
+    <div id="prototypeContainer" class="frame-desktop"></div>
+  </main>
+
+  <!-- Toast Notification -->
+  <div id="toastArea" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Figma Export Guide Modal -->
+  <div id="figmaModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-[#111827]/40 p-4">
+    <div class="bg-white border border-[#E5E2DC] rounded-lg max-w-lg w-full p-6 shadow-xl">
+      <div class="flex items-start justify-between gap-4 border-b border-[#E5E2DC] pb-3 mb-4">
+        <h2 class="font-serif-editorial text-2xl font-medium text-[#111827]">How to Import Any Screen Into Figma</h2>
+        <button id="btnCloseFigmaModal" type="button" class="text-[#4B5563] hover:text-[#111827] text-sm font-medium px-2 py-1">Close</button>
+      </div>
+      <ol class="list-decimal pl-5 space-y-2.5 text-sm text-[#374151] leading-relaxed">
+        <li>Pick one of the 6 ideas above and switch between <strong>Desktop</strong> and <strong>Mobile (390px)</strong> to test the layout.</li>
+        <li>Download or save this HTML file to your computer, or open it in Chrome.</li>
+        <li>Open <strong>Figma</strong> (free student plan) and install the free plugin <strong>html.to.design</strong>.</li>
+        <li>Run the plugin in Figma, drop this HTML file (or paste the live preview), and click <strong>Import</strong>.</li>
+        <li>Every heading, table, button, and input turns into editable Figma layers (ស្រទាប់ដែលអាចកែបាន) ready for your FST Phase 3 SDD!</li>
+      </ol>
+      <div class="mt-5 pt-3 border-t border-[#E5E2DC] flex justify-end">
+        <button id="btnCloseFigmaModal2" type="button" class="px-4 py-2 text-sm font-medium rounded-md bg-[#111827] text-white hover:bg-[#14532D] transition-colors">
+          Got it
+        </button>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function() {
+  // ---------- GLOBAL STATE ----------
+  const state = {
+    activeIdea: 'greenlight',
+    viewMode: 'desktop',
+    subTab: {
+      greenlight: 'screen',
+      eprlink: 'log',
+      traceforest: 'registry',
+      fairdebt: 'simulator',
+      ecoledger: 'pos',
+      loopfactory: 'market'
+    },
+    // 1. GreenLight KH
+    greenlight: {
+      sector: 'Energy',
+      businessName: 'Sovann Solar Rice Mill',
+      loanAmount: 25000,
+      tsc: true,
+      dnsh: true,
+      mss: true,
+      filter: 'ALL',
+      queue: [
+        { id: 'GL-2026-01', business: 'Kratie Rooftop Solar Co.', sector: 'Energy', amount: 45000, rating: 'GREEN', date: '2026-11-18' },
+        { id: 'GL-2026-02', business: 'Phnom Penh E-TukTuk Fleet', sector: 'Transport', amount: 18500, rating: 'GREEN', date: '2026-11-19' },
+        { id: 'GL-2026-03', business: 'Borey Eco-Insulation Upgrade', sector: 'Buildings', amount: 32000, rating: 'AMBER', date: '2026-11-19' },
+        { id: 'GL-2026-04', business: 'Old Diesel Generator Expansion', sector: 'Energy', amount: 15000, rating: 'RED', date: '2026-11-20' }
+      ]
+    },
+    // 2. EPR-Link KH
+    eprlink: {
+      shopName: 'Bora Mobile Repair (Toul Kork)',
+      wasteType: 'Used Phone Batteries',
+      weightKg: 12.5,
+      collector: 'Sophea Verified Collector (#C-104)',
+      batches: [
+        { id: 'EPR-8841', shop: 'Kampuchea Tech Shop', type: 'Used Phone Batteries', kg: 18.0, rateUsd: 1.80, collector: 'Sophea (#C-104)', status: 'Verified' },
+        { id: 'EPR-8842', shop: 'Chakto Cafe & Roastery', type: 'PET Plastic Packaging', kg: 34.5, rateUsd: 0.45, collector: 'Dara (#C-209)', status: 'Verified' },
+        { id: 'EPR-8843', shop: 'Sen Sok Computer Hub', type: 'Broken Laptops & Boards', kg: 22.0, rateUsd: 2.20, collector: 'Vannak (#C-118)', status: 'Paid Fairly' }
+      ]
+    },
+    // 3. TraceForest KH
+    traceforest: {
+      selectedId: 'PLOT-KC-01',
+      plots: [
+        { id: 'PLOT-KC-01', farmer: 'Sokha Meas', crop: 'Natural Rubber', province: 'Kampong Cham', ha: 3.4, lat: 12.0124, lng: 105.4581, pre2020: true, priceUsd: 1.62, benchmarkUsd: 1.55 },
+        { id: 'PLOT-ST-02', farmer: 'Chanthy Keo', crop: 'Raw Cashew', province: 'Stung Treng', ha: 2.8, lat: 13.5259, lng: 105.9683, pre2020: true, priceUsd: 1.48, benchmarkUsd: 1.40 },
+        { id: 'PLOT-MK-03', farmer: 'Pheap Nhem', crop: 'Arabica Coffee', province: 'Mondulkiri', ha: 1.9, lat: 12.4558, lng: 107.1881, pre2020: true, priceUsd: 3.10, benchmarkUsd: 2.95 }
+      ],
+      newFarmer: '',
+      newCrop: 'Natural Rubber',
+      newProvince: 'Kampong Cham',
+      newHa: 2.0,
+      newPrice: 1.60,
+      newPre2020: true
+    },
+    // 4. FairDebt KH
+    fairdebt: {
+      monthlyIncome: 520,
+      existingDebt: 110,
+      newLoan: 3000,
+      monthlyRate: 1.25,
+      termMonths: 24,
+      shockType: 'Severe Flood (ទឹកជំនន់)',
+      reducedIncome: 290,
+      borrowerName: 'Srey Leak (Kandal Province)',
+      lenderName: 'Local Microfinance Branch'
+    },
+    // 5. EcoLedger KH
+    ecoledger: {
+      itemName: 'Iced Coffee & Pastry',
+      amountUsd: 4.50,
+      paymentMethod: 'KHQR',
+      paperless: true,
+      monthlyElectricityUsd: 68,
+      monthlyPlasticUsd: 35,
+      sales: [
+        { id: 'RCP-501', item: 'Organic Rice 5kg (2 bags)', amount: 14.00, method: 'KHQR', paperless: true, time: '08:12' },
+        { id: 'RCP-502', item: 'Fresh Fruit Basket', amount: 8.50, method: 'KHQR', paperless: true, time: '08:45' },
+        { id: 'RCP-503', item: 'Cold Drinks Pack', amount: 6.00, method: 'Cash', paperless: true, time: '09:15' },
+        { id: 'RCP-504', item: 'Local Honey Jar', amount: 11.50, method: 'KHQR', paperless: true, time: '09:50' }
+      ]
+    },
+    // 6. LoopFactory KH
+    loopfactory: {
+      categoryFilter: 'ALL',
+      listings: [
+        { id: 'LF-301', factory: 'Meanchey Garment Co.', category: 'Garment Offcuts', material: 'Clean 100% Cotton Fabric Scraps', kg: 420, priceUsd: 0.25, location: 'Phnom Penh', status: 'Available' },
+        { id: 'LF-302', factory: 'Battambang Green Mill', category: 'Rice Husks', material: 'Dry Rice Husks for Biomass Fuel', kg: 1200, priceUsd: 0.08, location: 'Battambang', status: 'Available' },
+        { id: 'LF-303', factory: 'Kampong Thom Cashew SME', category: 'Cashew Shells', material: 'Clean Cashew Shells for Bio-Oil', kg: 650, priceUsd: 0.14, location: 'Kampong Thom', status: 'Available' },
+        { id: 'LF-304', factory: 'Chbar Ampov Packaging', category: 'Cardboard', material: 'Baled Clean Corrugated Boxes', kg: 310, priceUsd: 0.18, location: 'Phnom Penh', status: 'Claimed' }
+      ],
+      newFactory: '',
+      newCategory: 'Garment Offcuts',
+      newMaterial: '',
+      newKg: 250,
+      newPrice: 0.20
+    }
+  };
+
+  const WASTE_RATES = {
+    'Used Phone Batteries': 1.80,
+    'Broken Laptops & Boards': 2.20,
+    'PET Plastic Packaging': 0.45
+  };
+
+  // ---------- HELPERS ----------
+  function showToast(msg) {
+    const area = document.getElementById('toastArea');
+    const el = document.createElement('div');
+    el.className = 'toast-enter pointer-events-auto bg-[#111827] text-white text-xs sm:text-sm px-4 py-2.5 rounded-md shadow-lg max-w-xs';
+    el.textContent = msg;
+    area.appendChild(el);
+    setTimeout(() => {
+      el.remove();
+    }, 3000);
+  }
+
+  function copyText(text, successMsg) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => showToast(successMsg)).catch(() => fallbackCopy(text, successMsg));
+    } else {
+      fallbackCopy(text, successMsg);
+    }
+  }
+
+  function fallbackCopy(text, successMsg) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+      document.execCommand('copy');
+      showToast(successMsg);
+    } catch (e) {
+      showToast('Copy ready — select and copy text manually.');
+    }
+    document.body.removeChild(ta);
+  }
+
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function makeQrSvg(seed) {
+    let hash = 0;
+    for (let i = 0; i < seed.length; i++) hash = ((hash << 5) - hash + seed.charCodeAt(i)) | 0;
+    let cells = '';
+    for (let r = 0; r < 9; r++) {
+      for (let c = 0; c < 9; c++) {
+        const corner = (r < 3 && c < 3) || (r < 3 && c > 5) || (r > 5 && c < 3);
+        const bit = ((hash >> ((r * 9 + c) % 28)) & 1) === 1;
+        if (corner || bit) {
+          cells += `<rect x="${c * 10 + 5}" y="${r * 10 + 5}" width="8" height="8" fill="#111827"/>`;
+        }
+      }
+    }
+    return `<svg viewBox="0 0 100 100" class="w-24 h-24 border border-[#E5E2DC] bg-white p-1" role="img" aria-label="Batch QR Code">${cells}</svg>`;
+  }
+
+  // ---------- 1. GREENLIGHT KH ----------
+  function computeGreenLightRating(g) {
+    if (!g.dnsh || !g.mss) {
+      return {
+        rating: 'RED',
+        label: 'RED — Ineligible (មិនសមស្រប)',
+        color: '#991B1B',
+        reason: 'Failed Do No Significant Harm or Minimum Social Safeguards. Cannot be labeled as a green loan.'
+      };
+    }
+    if (g.tsc) {
+      return {
+        rating: 'GREEN',
+        label: 'GREEN — Aligned (ស្របតាមស្តង់ដារបៃតង)',
+        color: '#14532D',
+        reason: 'Passes NBC April 2026 Technical Screening Criteria, DNSH, and Social Safeguards.'
+      };
+    }
+    return {
+      rating: 'AMBER',
+      label: 'AMBER — Transitional (កំពុងផ្លាស់ប្តូរ)',
+      color: '#92400E',
+      reason: 'Safe socially and environmentally, but needs an upgrade plan to meet full green targets.'
+    };
+  }
+
+  function renderGreenLight() {
+    const g = state.greenlight;
+    const sub = state.subTab.greenlight;
+    const result = computeGreenLightRating(g);
+    const filtered = g.filter === 'ALL' ? g.queue : g.queue.filter(q => q.rating === g.filter);
+    const greenCount = g.queue.filter(q => q.rating === 'GREEN').length;
+
+    return `
+      <section class="bg-white border border-[#E5E2DC] rounded-lg p-5 sm:p-7">
+        <div class="flex flex-wrap items-start justify-between gap-4 border-b border-[#E5E2DC] pb-4 mb-6">
+          <div>
+            <h2 class="font-serif-editorial text-2xl sm:text-3xl font-medium text-[#111827]">1. GreenLight KH</h2>
+            <p class="text-sm text-[#4B5563] mt-1">
+              NBC April 2026 Sustainable Finance Taxonomy (ប្រព័ន្ធចំណាត់ថ្នាក់ហិរញ្ញវត្ថុប្រកបដោយចីរភាព) Screening Tool
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" data-subtab="screen" class="subtab-btn ${sub === 'screen' ? 'active' : ''}">Loan Screening Form</button>
+            <button type="button" data-subtab="queue" class="subtab-btn ${sub === 'queue' ? 'active' : ''}">Officer Queue (${g.queue.length})</button>
+          </div>
+        </div>
+
+        ${sub === 'screen' ? `
+          <div class="responsive-grid grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-7 space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-[#111827] mb-1" for="glBusiness">MSME Business Name</label>
+                <input id="glBusiness" type="text" value="${escHtml(g.businessName)}" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm focus:outline-none focus:border-[#14532D]">
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-[#111827] mb-1" for="glSector">NBC Taxonomy Sector</label>
+                  <select id="glSector" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm bg-white focus:outline-none focus:border-[#14532D]">
+                    <option value="Energy" ${g.sector === 'Energy' ? 'selected' : ''}>Energy (Solar / Clean Power)</option>
+                    <option value="Transport" ${g.sector === 'Transport' ? 'selected' : ''}>Transport (EV / E-TukTuk)</option>
+                    <option value="Buildings" ${g.sector === 'Buildings' ? 'selected' : ''}>Buildings &amp; Construction</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-[#111827] mb-1" for="glAmount">Loan Amount (USD)</label>
+                  <input id="glAmount" type="number" min="500" step="500" value="${g.loanAmount}" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm font-mono-code focus:outline-none focus:border-[#14532D]">
+                </div>
+              </div>
+
+              <div class="border-t border-[#E5E2DC] pt-4 space-y-3">
+                <p class="text-sm font-semibold text-[#111827]">NBC Rulebook Checks (Toggle to see Traffic Light change)</p>
+                <label class="flex items-start gap-3 text-sm cursor-pointer">
+                  <input id="glTsc" type="checkbox" ${g.tsc ? 'checked' : ''} class="mt-1 accent-[#14532D]">
+                  <span><strong>Technical Screening Criteria (TSC):</strong> Project cuts carbon emissions or uses clean renewable energy.</span>
+                </label>
+                <label class="flex items-start gap-3 text-sm cursor-pointer">
+                  <input id="glDnsh" type="checkbox" ${g.dnsh ? 'checked' : ''} class="mt-1 accent-[#14532D]">
+                  <span><strong>Do No Significant Harm (DNSH):</strong> No toxic water pollution, illegal logging, or unsafe waste dumping.</span>
+                </label>
+                <label class="flex items-start gap-3 text-sm cursor-pointer">
+                  <input id="glMss" type="checkbox" ${g.mss ? 'checked' : ''} class="mt-1 accent-[#14532D]">
+                  <span><strong>Minimum Social Safeguards (MSS):</strong> Fair worker pay, safe workplace, and zero child labor.</span>
+                </label>
+              </div>
+
+              <div class="pt-2 flex flex-wrap gap-3">
+                <button id="btnGlSubmit" type="button" class="px-4 py-2 text-sm font-medium rounded-md bg-[#14532D] text-white hover:bg-[#166534]">
+                  Submit to Bank Review Queue
+                </button>
+                <button id="btnGlCopyReport" type="button" class="px-4 py-2 text-sm font-medium rounded-md border border-[#E5E2DC] text-[#111827] hover:bg-[#FAF9F6]">
+                  Copy NBC Screening Summary
+                </button>
+              </div>
+            </div>
+
+            <div class="lg:col-span-5 border-t lg:border-t-0 lg:border-l border-[#E5E2DC] pt-5 lg:pt-0 lg:pl-7 flex flex-col justify-between">
+              <div>
+                <p class="text-xs font-mono-code text-[#4B5563]">LIVE TRAFFIC LIGHT RESULT</p>
+                <p class="font-serif-editorial text-2xl font-medium mt-2" style="color:${result.color};">${result.label}</p>
+                <p class="text-sm text-[#4B5563] mt-2 leading-relaxed">${result.reason}</p>
+
+                <div class="mt-6 pt-4 border-t border-[#E5E2DC] space-y-2 text-sm">
+                  <div class="flex justify-between">
+                    <span class="text-[#4B5563]">Applicant</span>
+                    <span class="font-medium text-[#111827]">${escHtml(g.businessName || 'Unnamed MSME')}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-[#4B5563]">Requested Loan</span>
+                    <span class="font-mono-code font-medium text-[#111827]">$${Number(g.loanAmount || 0).toLocaleString()}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-[#4B5563]">Greenwashing Risk</span>
+                    <span class="font-medium" style="color:${result.rating === 'GREEN' ? '#14532D' : '#991B1B'};">${result.rating === 'GREEN' ? 'Low (Verified)' : 'Check Required'}</span>
+                  </div>
+                </div>
+              </div>
+              <p class="text-xs text-[#4B5563] mt-6 pt-3 border-t border-[#E5E2DC]">
+                Portfolio Snapshot: <strong>${greenCount} of ${g.queue.length}</strong> screened loans qualify as Green.
+              </p>
+            </div>
+          </div>
+        ` : `
+          <div>
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+              <p class="text-sm text-[#4B5563]">Filter screened MSME loans by NBC Traffic Light status:</p>
+              <div class="flex gap-1.5 text-xs">
+                ${['ALL', 'GREEN', 'AMBER', 'RED'].map(f => `
+                  <button type="button" data-gl-filter="${f}" class="px-3 py-1.5 rounded border ${g.filter === f ? 'bg-[#111827] text-white border-[#111827]' : 'bg-white text-[#4B5563] border-[#E5E2DC]'}">${f}</button>
+                `).join('')}
+              </div>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-sm border-collapse">
+                <thead>
+                  <tr class="border-b border-[#111827] font-mono-code text-xs text-[#4B5563]">
+                    <th class="py-2 pr-4">ID</th>
+                    <th class="py-2 pr-4">Business</th>
+                    <th class="py-2 pr-4">Sector</th>
+                    <th class="py-2 pr-4">Loan (USD)</th>
+                    <th class="py-2">NBC Rating</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${filtered.map(item => `
+                    <tr class="border-b border-[#E5E2DC]">
+                      <td class="py-3 pr-4 font-mono-code text-xs">${escHtml(item.id)}</td>
+                      <td class="py-3 pr-4 font-medium text-[#111827]">${escHtml(item.business)}</td>
+                      <td class="py-3 pr-4 text-[#4B5563]">${escHtml(item.sector)}</td>
+                      <td class="py-3 pr-4 font-mono-code">$${item.amount.toLocaleString()}</td>
+                      <td class="py-3 font-mono-code text-xs font-semibold" style="color:${item.rating === 'GREEN' ? '#14532D' : item.rating === 'AMBER' ? '#92400E' : '#991B1B'};">${item.rating}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `}
+      </section>
+    `;
+  }
+
+  // ---------- 2. EPR-LINK KH ----------
+  function renderEprLink() {
+    const e = state.eprlink;
+    const sub = state.subTab.eprlink;
+    const rate = WASTE_RATES[e.wasteType] || 1.0;
+    const payUsd = (Number(e.weightKg || 0) * rate);
+    const payKhr = Math.round(payUsd * 4050);
+    const totalKg = e.batches.reduce((s, b) => s + b.kg, 0);
+    const totalPaidUsd = e.batches.reduce((s, b) => s + (b.kg * b.rateUsd), 0);
+    const latestBatch = e.batches[0];
+
+    return `
+      <section class="bg-white border border-[#E5E2DC] rounded-lg p-5 sm:p-7">
+        <div class="flex flex-wrap items-start justify-between gap-4 border-b border-[#E5E2DC] pb-4 mb-6">
+          <div>
+            <h2 class="font-serif-editorial text-2xl sm:text-3xl font-medium text-[#111827]">2. EPR-Link KH</h2>
+            <p class="text-sm text-[#4B5563] mt-1">
+              Ethical E-Waste (Directive 2196/0325) &amp; Plastic Take-Back with Fair Collector Pay
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" data-subtab="log" class="subtab-btn ${sub === 'log' ? 'active' : ''}">Log Waste Batch</button>
+            <button type="button" data-subtab="ledger" class="subtab-btn ${sub === 'ledger' ? 'active' : ''}">Fair-Pay Ledger (${e.batches.length})</button>
+          </div>
+        </div>
+
+        ${sub === 'log' ? `
+          <div class="responsive-grid grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-7 space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-[#111827] mb-1" for="eprShop">Business / Drop-off Shop</label>
+                <input id="eprShop" type="text" value="${escHtml(e.shopName)}" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm focus:outline-none focus:border-[#14532D]">
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-[#111827] mb-1" for="eprType">Waste Category</label>
+                  <select id="eprType" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm bg-white">
+                    ${Object.keys(WASTE_RATES).map(k => `<option value="${k}" ${e.wasteType === k ? 'selected' : ''}>${k} ($${WASTE_RATES[k].toFixed(2)}/kg)</option>`).join('')}
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-[#111827] mb-1" for="eprWeight">Weight (kg)</label>
+                  <input id="eprWeight" type="number" min="0.5" step="0.5" value="${e.weightKg}" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm font-mono-code">
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-[#111827] mb-1" for="eprCollector">Verified Safe Collector (អ្នកប្រមូលដែលមានការបញ្ជាក់)</label>
+                <select id="eprCollector" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm bg-white">
+                  <option ${e.collector.includes('C-104') ? 'selected' : ''}>Sophea Verified Collector (#C-104)</option>
+                  <option ${e.collector.includes('C-209') ? 'selected' : ''}>Dara Verified Collector (#C-209)</option>
+                  <option ${e.collector.includes('C-118') ? 'selected' : ''}>Vannak Verified Collector (#C-118)</option>
+                </select>
+              </div>
+              <div class="pt-2">
+                <button id="btnEprLog" type="button" class="px-4 py-2 text-sm font-medium rounded-md bg-[#14532D] text-white hover:bg-[#166534]">
+                  Generate QR Batch &amp; Record Fair Pay
+                </button>
+              </div>
+            </div>
+
+            <div class="lg:col-span-5 border-t lg:border-t-0 lg:border-l border-[#E5E2DC] pt-5 lg:pt-0 lg:pl-7">
+              <p class="text-xs font-mono-code text-[#4B5563]">FAIR COLLECTOR PAYOUT PREVIEW</p>
+              <p class="font-serif-editorial text-3xl font-medium text-[#14532D] mt-2">$${payUsd.toFixed(2)} <span class="text-base font-mono-code text-[#4B5563]">(${payKhr.toLocaleString()} KHR)</span></p>
+              <p class="text-xs text-[#4B5563] mt-1">Guaranteed minimum rate — zero toxic open burning allowed.</p>
+
+              <div class="mt-5 pt-4 border-t border-[#E5E2DC] flex items-center gap-4">
+                ${makeQrSvg(latestBatch.id + latestBatch.shop)}
+                <div class="text-xs space-y-1 text-[#4B5563]">
+                  <p class="font-mono-code font-semibold text-[#111827]">Latest QR: ${latestBatch.id}</p>
+                  <p>${escHtml(latestBatch.shop)}</p>
+                  <p>Total Diverted: <strong>${totalKg.toFixed(1)} kg</strong></p>
+                  <p>Total Fair Pay: <strong>$${totalPaidUsd.toFixed(2)}</strong></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        ` : `
+          <div>
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+              <p class="text-sm text-[#4B5563]">6-Month Ministry of Environment EPR Compliance Ledger (Total: <strong>${totalKg.toFixed(1)} kg</strong> safely recycled).</p>
+              <button id="btnEprCopy" type="button" class="px-3 py-1.5 text-xs font-medium rounded border border-[#14532D] text-[#14532D] hover:bg-[#14532D] hover:text-white">Copy 6-Month MoE Summary</button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-sm border-collapse">
+                <thead>
+                  <tr class="border-b border-[#111827] font-mono-code text-xs text-[#4B5563]">
+                    <th class="py-2 pr-4">Batch ID</th>
+                    <th class="py-2 pr-4">Shop</th>
+                    <th class="py-2 pr-4">Waste Type</th>
+                    <th class="py-2 pr-4">Weight</th>
+                    <th class="py-2 pr-4">Fair Pay</th>
+                    <th class="py-2">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${e.batches.map(b => `
+                    <tr class="border-b border-[#E5E2DC]">
+                      <td class="py-3 pr-4 font-mono-code text-xs">${escHtml(b.id)}</td>
+                      <td class="py-3 pr-4 font-medium text-[#111827]">${escHtml(b.shop)}</td>
+                      <td class="py-3 pr-4 text-[#4B5563]">${escHtml(b.type)}</td>
+                      <td class="py-3 pr-4 font-mono-code">${b.kg.toFixed(1)} kg</td>
+                      <td class="py-3 pr-4 font-mono-code text-[#14532D]">$${(b.kg * b.rateUsd).toFixed(2)}</td>
+                      <td class="py-3 text-xs font-medium text-[#14532D]">${escHtml(b.status)}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `}
+      </section>
+    `;
+  }
+
+  // ---------- 3. TRACEFOREST KH ----------
+  function renderTraceForest() {
+    const t = state.traceforest;
+    const sub = state.subTab.traceforest;
+    const selected = t.plots.find(p => p.id === t.selectedId) || t.plots[0];
+    const geoJson = JSON.stringify({
+      type: 'Feature',
+      properties: {
+        plot_id: selected.id,
+        farmer: selected.farmer,
+        commodity: selected.crop,
+        province: selected.province,
+        area_hectares: selected.ha,
+        deforestation_free_since_2020_12_31: selected.pre2020,
+        fair_farmgate_price_usd_kg: selected.priceUsd
+      },
+      geometry: {
+        type: 'Point',
+        coordinates: [selected.lng, selected.lat]
+      }
+    }, null, 2);
+
+    return `
+      <section class="bg-white border border-[#E5E2DC] rounded-lg p-5 sm:p-7">
+        <div class="flex flex-wrap items-start justify-between gap-4 border-b border-[#E5E2DC] pb-4 mb-6">
+          <div>
+            <h2 class="font-serif-editorial text-2xl sm:text-3xl font-medium text-[#111827]">3. TraceForest KH</h2>
+            <p class="text-sm text-[#4B5563] mt-1">
+              EU Deforestation Regulation (EUDR) Smallholder Farm Geolocation &amp; Fair Price Tracker
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" data-subtab="registry" class="subtab-btn ${sub === 'registry' ? 'active' : ''}">Farm Plot Registry (${t.plots.length})</button>
+            <button type="button" data-subtab="geojson" class="subtab-btn ${sub === 'geojson' ? 'active' : ''}">EUDR GeoJSON Export</button>
+          </div>
+        </div>
+
+        ${sub === 'registry' ? `
+          <div class="responsive-grid grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-7 space-y-3">
+              <p class="text-xs font-mono-code text-[#4B5563]">CLICK A FARM PLOT TO INSPECT EUDR &amp; FAIR-PRICE STATUS</p>
+              ${t.plots.map(p => `
+                <button type="button" data-plot-id="${p.id}" class="w-full text-left p-4 rounded-md border transition-colors ${p.id === selected.id ? 'border-[#14532D] bg-[#FAF9F6]' : 'border-[#E5E2DC] bg-white hover:bg-[#FAF9F6]'}">
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="font-medium text-[#111827]">${escHtml(p.farmer)} — ${escHtml(p.crop)}</span>
+                    <span class="font-mono-code text-xs ${p.pre2020 ? 'text-[#14532D]' : 'text-[#991B1B]'}">${p.pre2020 ? 'EUDR READY' : 'REVIEW'}</span>
+                  </div>
+                  <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[#4B5563] mt-1.5 font-mono-code">
+                    <span>${escHtml(p.province)}</span>
+                    <span>${p.ha} ha</span>
+                    <span>GPS: ${p.lat.toFixed(4)}, ${p.lng.toFixed(4)}</span>
+                    <span>Paid: $${p.priceUsd.toFixed(2)}/kg</span>
+                  </div>
+                </button>
+              `).join('')}
+            </div>
+
+            <div class="lg:col-span-5 border-t lg:border-t-0 lg:border-l border-[#E5E2DC] pt-5 lg:pt-0 lg:pl-7 space-y-3">
+              <h3 class="font-serif-editorial text-xl font-medium text-[#111827]">Add Smallholder Farm Plot</h3>
+              <div>
+                <label class="block text-xs font-medium text-[#4B5563] mb-1" for="tfFarmer">Farmer Name</label>
+                <input id="tfFarmer" type="text" placeholder="e.g., Dara Bun" value="${escHtml(t.newFarmer)}" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm">
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-medium text-[#4B5563] mb-1" for="tfCrop">Commodity</label>
+                  <select id="tfCrop" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm bg-white">
+                    <option ${t.newCrop === 'Natural Rubber' ? 'selected' : ''}>Natural Rubber</option>
+                    <option ${t.newCrop === 'Raw Cashew' ? 'selected' : ''}>Raw Cashew</option>
+                    <option ${t.newCrop === 'Arabica Coffee' ? 'selected' : ''}>Arabica Coffee</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-[#4B5563] mb-1" for="tfProvince">Province</label>
+                  <select id="tfProvince" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm bg-white">
+                    <option ${t.newProvince === 'Kampong Cham' ? 'selected' : ''}>Kampong Cham</option>
+                    <option ${t.newProvince === 'Stung Treng' ? 'selected' : ''}>Stung Treng</option>
+                    <option ${t.newProvince === 'Mondulkiri' ? 'selected' : ''}>Mondulkiri</option>
+                    <option ${t.newProvince === 'Ratanakiri' ? 'selected' : ''}>Ratanakiri</option>
+                  </select>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-medium text-[#4B5563] mb-1" for="tfHa">Area (Hectares)</label>
+                  <input id="tfHa" type="number" step="0.1" min="0.2" value="${t.newHa}" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm font-mono-code">
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-[#4B5563] mb-1" for="tfPrice">Farm-Gate ($/kg)</label>
+                  <input id="tfPrice" type="number" step="0.05" min="0.2" value="${t.newPrice}" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm font-mono-code">
+                </div>
+              </div>
+              <label class="flex items-start gap-2.5 text-xs text-[#374151] cursor-pointer pt-1">
+                <input id="tfPre2020" type="checkbox" ${t.newPre2020 ? 'checked' : ''} class="mt-0.5 accent-[#14532D]">
+                <span>Confirmed deforestation-free after Dec 31, 2020 (គ្មានការកាប់ព្រៃឈើក្រោយឆ្នាំ ២០២០).</span>
+              </label>
+              <button id="btnTfAdd" type="button" class="w-full px-4 py-2 text-sm font-medium rounded-md bg-[#14532D] text-white hover:bg-[#166534]">
+                Register Farm Plot
+              </button>
+            </div>
+          </div>
+        ` : `
+          <div class="space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <p class="text-sm text-[#4B5563]">Selected Plot: <strong>${escHtml(selected.id)} (${escHtml(selected.farmer)})</strong> — Ready for EU buyer Due Diligence submission.</p>
+              <button id="btnTfCopyGeo" type="button" class="px-4 py-2 text-xs font-medium rounded-md bg-[#14532D] text-white hover:bg-[#166534]">
+                Copy EUDR GeoJSON
+              </button>
+            </div>
+            <pre class="bg-[#FAF9F6] border border-[#E5E2DC] rounded-md p-4 text-xs font-mono-code overflow-x-auto text-[#111827]">${escHtml(geoJson)}</pre>
+          </div>
+        `}
+      </section>
+    `;
+  }
+
+  // ---------- 4. FAIRDEBT KH ----------
+  function computeLoanMetrics(f) {
+    const inc = Math.max(0, Number(f.monthlyIncome) || 0);
+    const cur = Math.max(0, Number(f.existingDebt) || 0);
+    const P = Math.max(0, Number(f.newLoan) || 0);
+    const r = Math.max(0, Number(f.monthlyRate) || 0) / 100;
+    const n = Math.max(1, Number(f.termMonths) || 1);
+
+    let monthlyPay = 0;
+    if (P > 0) {
+      if (r === 0) {
+        monthlyPay = P / n;
+      } else {
+        const pow = Math.pow(1 + r, n);
+        monthlyPay = P * (r * pow) / (pow - 1);
+      }
+    }
+    const totalPaid = monthlyPay * n;
+    const totalInterest = Math.max(0, totalPaid - P);
+    const totalMonthlyDebt = cur + monthlyPay;
+    const dti = inc > 0 ? (totalMonthlyDebt / inc) * 100 : (totalMonthlyDebt > 0 ? 100 : 0);
+
+    let level = 'SAFE';
+    let color = '#14532D';
+    let advice = 'Your total monthly debt stays under 35% of income. This loan looks manageable.';
+    if (dti >= 50) {
+      level = 'HIGH RISK (ហានិភ័យខ្ពស់)';
+      color = '#991B1B';
+      advice = 'Danger of over-indebtedness (បំណុលវ័ណ្ឌក). Lower the loan amount or extend the term before signing.';
+    } else if (dti >= 35) {
+      level = 'CAUTION (គួរប្រុងប្រយ័ត្ន)';
+      color = '#92400E';
+      advice = 'Debt takes 35%–50% of monthly income. A small flood or illness could make repayment hard.';
+    }
+    return { monthlyPay, totalInterest, totalMonthlyDebt, dti, level, color, advice };
+  }
+
+  function renderFairDebt() {
+    const f = state.fairdebt;
+    const sub = state.subTab.fairdebt;
+    const m = computeLoanMetrics(f);
+
+    const letter = `REQUEST FOR ETHICAL LOAN RESTRUCTURING (សំណើរៀបចំឥណទានឡើងវិញ)\nDate: 20 November 2026\nTo: ${f.lenderName}\nFrom: ${f.borrowerName}\n\nDear Branch Manager,\nDue to ${f.shockType}, my household monthly income dropped from $${f.monthlyIncome} to $${f.reducedIncome}. Under the October 2026 ABC & CMA Responsible Lending Guidelines, I respectfully request a temporary 3-month interest-only grace period or extended repayment schedule so my family can keep paying fairly without losing our livelihood.\n\nCurrent Monthly Debt Obligation: $${m.totalMonthlyDebt.toFixed(2)}\nAffordable Monthly Payment During Recovery (30% of reduced income): $${(Math.max(0, Number(f.reducedIncome) || 0) * 0.30).toFixed(2)}\n\nThank you for your fair support.`;
+
+    return `
+      <section class="bg-white border border-[#E5E2DC] rounded-lg p-5 sm:p-7">
+        <div class="flex flex-wrap items-start justify-between gap-4 border-b border-[#E5E2DC] pb-4 mb-6">
+          <div>
+            <h2 class="font-serif-editorial text-2xl sm:text-3xl font-medium text-[#111827]">4. FairDebt KH</h2>
+            <p class="text-sm text-[#4B5563] mt-1">
+              Ethical Debt-Stress Early Warning &amp; Climate-Shock Loan Restructuring Portal
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" data-subtab="simulator" class="subtab-btn ${sub === 'simulator' ? 'active' : ''}">Loan Safety Simulator</button>
+            <button type="button" data-subtab="restructure" class="subtab-btn ${sub === 'restructure' ? 'active' : ''}">Climate Restructuring Letter</button>
+          </div>
+        </div>
+
+        ${sub === 'simulator' ? `
+          <div class="responsive-grid grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-7 space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-[#111827] mb-1" for="fdIncome">Monthly Household Income ($)</label>
+                  <input id="fdIncome" type="number" min="0" step="20" value="${f.monthlyIncome}" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm font-mono-code">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-[#111827] mb-1" for="fdExisting">Existing Monthly Debt ($)</label>
+                  <input id="fdExisting" type="number" min="0" step="10" value="${f.existingDebt}" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm font-mono-code">
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-sm mb-1">
+                  <label class="font-medium text-[#111827]" for="fdLoan">New Loan Amount</label>
+                  <span class="font-mono-code text-[#14532D] font-medium">$${Number(f.newLoan).toLocaleString()}</span>
+                </div>
+                <input id="fdLoan" type="range" min="200" max="15000" step="100" value="${f.newLoan}" class="w-full">
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-[#111827] mb-1" for="fdRate">Monthly Interest Rate (%)</label>
+                  <input id="fdRate" type="number" min="0" max="5" step="0.05" value="${f.monthlyRate}" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm font-mono-code">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-[#111827] mb-1" for="fdTerm">Loan Term (Months)</label>
+                  <input id="fdTerm" type="number" min="3" max="84" step="3" value="${f.termMonths}" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm font-mono-code">
+                </div>
+              </div>
+            </div>
+
+            <div class="lg:col-span-5 border-t lg:border-t-0 lg:border-l border-[#E5E2DC] pt-5 lg:pt-0 lg:pl-7">
+              <p class="text-xs font-mono-code text-[#4B5563]">DEBT-TO-INCOME (DTI) SAFETY CHECK</p>
+              <p class="font-serif-editorial text-4xl font-medium mt-1" style="color:${m.color};">${m.dti.toFixed(1)}%</p>
+              <p class="text-sm font-semibold mt-1" style="color:${m.color};">${m.level}</p>
+              <p class="text-sm text-[#4B5563] mt-2 leading-relaxed">${m.advice}</p>
+
+              <div class="mt-5 pt-4 border-t border-[#E5E2DC] space-y-2 text-sm">
+                <div class="flex justify-between">
+                  <span class="text-[#4B5563]">New Monthly Payment</span>
+                  <span class="font-mono-code font-medium">$${m.monthlyPay.toFixed(2)}/mo</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-[#4B5563]">Total Monthly Debt</span>
+                  <span class="font-mono-code font-medium">$${m.totalMonthlyDebt.toFixed(2)}/mo</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-[#4B5563]">True Total Interest Paid</span>
+                  <span class="font-mono-code font-medium text-[#991B1B]">$${m.totalInterest.toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        ` : `
+          <div class="responsive-grid grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-5 space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-[#111827] mb-1" for="fdShock">Climate / Income Shock</label>
+                <select id="fdShock" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm bg-white">
+                  <option ${f.shockType.includes('Flood') ? 'selected' : ''}>Severe Flood (ទឹកជំនន់)</option>
+                  <option ${f.shockType.includes('Drought') ? 'selected' : ''}>Dry-Season Drought (គ្រោះរាំងស្ងួត)</option>
+                  <option ${f.shockType.includes('Storm') ? 'selected' : ''}>Crop Storm Damage (ខ្យល់ព្យុះបំផ្លាញដំណាំ)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-[#111827] mb-1" for="fdReduced">New Reduced Monthly Income ($)</label>
+                <input id="fdReduced" type="number" min="0" step="10" value="${f.reducedIncome}" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm font-mono-code">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-[#111827] mb-1" for="fdBorrower">Borrower Name &amp; Province</label>
+                <input id="fdBorrower" type="text" value="${escHtml(f.borrowerName)}" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm">
+              </div>
+              <button id="btnFdCopyLetter" type="button" class="w-full px-4 py-2 text-sm font-medium rounded-md bg-[#14532D] text-white hover:bg-[#166534]">
+                Copy Restructuring Request Letter
+              </button>
+            </div>
+            <div class="lg:col-span-7">
+              <p class="text-xs font-mono-code text-[#4B5563] mb-2">GENERATED BANK / MFI REQUEST PACKET</p>
+              <pre class="bg-[#FAF9F6] border border-[#E5E2DC] rounded-md p-4 text-xs sm:text-sm whitespace-pre-wrap font-sans leading-relaxed text-[#111827]">${escHtml(letter)}</pre>
+            </div>
+          </div>
+        `}
+      </section>
+    `;
+  }
+
+  // ---------- 5. ECOLEDGER KH ----------
+  function renderEcoLedger() {
+    const ec = state.ecoledger;
+    const sub = state.subTab.ecoledger;
+    const totalSales = ec.sales.reduce((s, x) => s + x.amount, 0);
+    const khqrSales = ec.sales.filter(x => x.method === 'KHQR').reduce((s, x) => s + x.amount, 0);
+    const khqrShare = totalSales > 0 ? (khqrSales / totalSales) * 100 : 0;
+    const paperSaved = ec.sales.filter(x => x.paperless).length;
+    const creditScore = Math.min(100, Math.round(55 + (khqrShare * 0.25) + Math.min(20, ec.sales.length * 3)));
+    const latest = ec.sales[0];
+
+    return `
+      <section class="bg-white border border-[#E5E2DC] rounded-lg p-5 sm:p-7">
+        <div class="flex flex-wrap items-start justify-between gap-4 border-b border-[#E5E2DC] pb-4 mb-6">
+          <div>
+            <h2 class="font-serif-editorial text-2xl sm:text-3xl font-medium text-[#111827]">5. EcoLedger KH</h2>
+            <p class="text-sm text-[#4B5563] mt-1">
+              KHQR Cash-Flow Bookkeeping (ការកត់ត្រាគណនេយ្យ), Paperless Receipts &amp; Green Credit Score
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" data-subtab="pos" class="subtab-btn ${sub === 'pos' ? 'active' : ''}">Quick Sale &amp; Receipt</button>
+            <button type="button" data-subtab="score" class="subtab-btn ${sub === 'score' ? 'active' : ''}">Green Credit Readiness</button>
+          </div>
+        </div>
+
+        ${sub === 'pos' ? `
+          <div class="responsive-grid grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-7 space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-[#111827] mb-1" for="ecItem">Item Sold</label>
+                <input id="ecItem" type="text" value="${escHtml(ec.itemName)}" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm">
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-[#111827] mb-1" for="ecAmount">Amount (USD)</label>
+                  <input id="ecAmount" type="number" min="0.25" step="0.25" value="${ec.amountUsd}" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm font-mono-code">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-[#111827] mb-1" for="ecMethod">Payment Method</label>
+                  <select id="ecMethod" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm bg-white">
+                    <option value="KHQR" ${ec.paymentMethod === 'KHQR' ? 'selected' : ''}>KHQR Digital Payment</option>
+                    <option value="Cash" ${ec.paymentMethod === 'Cash' ? 'selected' : ''}>Cash (សាច់ប្រាក់)</option>
+                  </select>
+                </div>
+              </div>
+              <label class="flex items-center gap-2.5 text-sm cursor-pointer">
+                <input id="ecPaperless" type="checkbox" ${ec.paperless ? 'checked' : ''} class="accent-[#14532D]">
+                <span>Issue Digital QR Receipt (No toxic BPA thermal paper waste)</span>
+              </label>
+              <button id="btnEcAdd" type="button" class="px-4 py-2 text-sm font-medium rounded-md bg-[#14532D] text-white hover:bg-[#166534]">
+                Record Sale &amp; Issue Paperless Receipt
+              </button>
+
+              <div class="pt-4 border-t border-[#E5E2DC]">
+                <p class="text-xs font-mono-code text-[#4B5563] mb-2">TODAY'S DIGITAL LEDGER (${ec.sales.length} SALES)</p>
+                <div class="space-y-2">
+                  ${ec.sales.slice(0, 5).map(s => `
+                    <div class="flex items-center justify-between text-sm py-1.5 border-b border-[#E5E2DC]">
+                      <div>
+                        <span class="font-medium text-[#111827]">${escHtml(s.item)}</span>
+                        <span class="text-xs text-[#4B5563] ml-2 font-mono-code">${s.method}</span>
+                      </div>
+                      <span class="font-mono-code font-medium text-[#14532D]">$${s.amount.toFixed(2)}</span>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+
+            <div class="lg:col-span-5 border-t lg:border-t-0 lg:border-l border-[#E5E2DC] pt-5 lg:pt-0 lg:pl-7">
+              <p class="text-xs font-mono-code text-[#4B5563]">CUSTOMER PAPERLESS RECEIPT PREVIEW</p>
+              <div class="mt-3 p-4 bg-[#FAF9F6] border border-[#E5E2DC] rounded-md text-center space-y-2">
+                <p class="font-serif-editorial text-lg font-medium text-[#111827]">Receipt ${escHtml(latest.id)}</p>
+                <p class="text-sm text-[#4B5563]">${escHtml(latest.item)}</p>
+                <p class="font-mono-code text-2xl font-medium text-[#14532D]">$${latest.amount.toFixed(2)}</p>
+                <div class="flex justify-center py-1">${makeQrSvg(latest.id + latest.item)}</div>
+                <p class="text-xs text-[#4B5563]">Paid via ${latest.method} · Scan to save digital copy</p>
+              </div>
+              <div class="mt-4 text-xs text-[#4B5563] flex justify-between pt-3 border-t border-[#E5E2DC]">
+                <span>Paper Receipts Saved Today:</span>
+                <strong class="font-mono-code text-[#14532D]">${paperSaved} sheets</strong>
+              </div>
+            </div>
+          </div>
+        ` : `
+          <div class="responsive-grid grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div class="border-t border-[#111827] pt-4">
+              <p class="text-xs font-mono-code text-[#4B5563]">BANK CREDIT READINESS</p>
+              <p class="font-serif-editorial text-4xl font-medium text-[#14532D] mt-2">${creditScore} / 100</p>
+              <p class="text-xs text-[#4B5563] mt-1">Strong digital KHQR trail helps unlock formal bank loans.</p>
+            </div>
+            <div class="border-t border-[#111827] pt-4">
+              <p class="text-xs font-mono-code text-[#4B5563]">TODAY'S REVENUE &amp; KHQR SHARE</p>
+              <p class="font-serif-editorial text-4xl font-medium text-[#111827] mt-2">$${totalSales.toFixed(2)}</p>
+              <p class="text-xs text-[#4B5563] mt-1"><strong>${khqrShare.toFixed(0)}%</strong> collected via verifiable KHQR payments.</p>
+            </div>
+            <div class="border-t border-[#111827] pt-4">
+              <p class="text-xs font-mono-code text-[#4B5563]">MONTHLY GREEN COSTS</p>
+              <p class="font-serif-editorial text-4xl font-medium text-[#111827] mt-2">$${ec.monthlyElectricityUsd + ec.monthlyPlasticUsd}</p>
+              <p class="text-xs text-[#4B5563] mt-1">Electricity ($${ec.monthlyElectricityUsd}) + Packaging ($${ec.monthlyPlasticUsd}).</p>
+            </div>
+          </div>
+          <div class="mt-6 pt-4 border-t border-[#E5E2DC] flex justify-end">
+            <button id="btnEcCopyBank" type="button" class="px-4 py-2 text-sm font-medium rounded-md bg-[#14532D] text-white hover:bg-[#166534]">
+              Copy Bank Loan Cash-Flow Summary
+            </button>
+          </div>
+        `}
+      </section>
+    `;
+  }
+
+  // ---------- 6. LOOPFACTORY KH ----------
+  function renderLoopFactory() {
+    const lf = state.loopfactory;
+    const sub = state.subTab.loopfactory;
+    const filtered = lf.categoryFilter === 'ALL' ? lf.listings : lf.listings.filter(x => x.category === lf.categoryFilter);
+    const divertedKg = lf.listings.filter(x => x.status === 'Claimed').reduce((s, x) => s + x.kg, 0);
+    const co2SavedKg = Math.round(divertedKg * 1.4);
+
+    return `
+      <section class="bg-white border border-[#E5E2DC] rounded-lg p-5 sm:p-7">
+        <div class="flex flex-wrap items-start justify-between gap-4 border-b border-[#E5E2DC] pb-4 mb-6">
+          <div>
+            <h2 class="font-serif-editorial text-2xl sm:text-3xl font-medium text-[#111827]">6. LoopFactory KH</h2>
+            <p class="text-sm text-[#4B5563] mt-1">
+              Circular Industrial By-Product Exchange (ទីផ្សារកាកសំណល់ពីរោងចក្រ) for Cambodia's 3,386 Factories
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" data-subtab="market" class="subtab-btn ${sub === 'market' ? 'active' : ''}">B2B Marketplace (${lf.listings.length})</button>
+            <button type="button" data-subtab="post" class="subtab-btn ${sub === 'post' ? 'active' : ''}">Post Factory Leftovers</button>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-4 pb-4 mb-5 border-b border-[#E5E2DC] text-sm">
+          <div>
+            Landfill Waste Diverted (កាកសំណល់ដែលបានសង្គ្រោះ): <strong class="font-mono-code text-[#14532D]">${divertedKg.toLocaleString()} kg</strong>
+          </div>
+          <div>
+            Estimated Carbon Saved: <strong class="font-mono-code text-[#14532D]">${co2SavedKg.toLocaleString()} kg CO₂e</strong>
+          </div>
+        </div>
+
+        ${sub === 'market' ? `
+          <div class="flex flex-wrap gap-1.5 mb-5 text-xs">
+            ${['ALL', 'Garment Offcuts', 'Rice Husks', 'Cashew Shells', 'Cardboard'].map(c => `
+              <button type="button" data-lf-cat="${c}" class="px-3 py-1.5 rounded border ${lf.categoryFilter === c ? 'bg-[#111827] text-white border-[#111827]' : 'bg-white text-[#4B5563] border-[#E5E2DC]'}">${c}</button>
+            `).join('')}
+          </div>
+          <div class="responsive-grid grid grid-cols-1 md:grid-cols-2 gap-4">
+            ${filtered.map(item => `
+              <div class="border border-[#E5E2DC] rounded-md p-4 flex flex-col justify-between bg-[#FAF9F6]/50">
+                <div>
+                  <div class="flex items-start justify-between gap-2">
+                    <h3 class="font-medium text-[#111827]">${escHtml(item.material)}</h3>
+                    <span class="font-mono-code text-xs ${item.status === 'Claimed' ? 'text-[#4B5563]' : 'text-[#14532D] font-semibold'}">${item.status}</span>
+                  </div>
+                  <p class="text-xs text-[#4B5563] mt-1">${escHtml(item.factory)} · ${escHtml(item.location)}</p>
+                  <div class="flex gap-4 mt-3 text-xs font-mono-code text-[#111827]">
+                    <span>Qty: ${item.kg} kg</span>
+                    <span>Price: $${item.priceUsd.toFixed(2)}/kg</span>
+                    <span>Total: $${(item.kg * item.priceUsd).toFixed(2)}</span>
+                  </div>
+                </div>
+                <div class="mt-4 pt-3 border-t border-[#E5E2DC]">
+                  <button type="button" data-lf-claim="${item.id}" ${item.status === 'Claimed' ? 'disabled' : ''} class="w-full px-3 py-1.5 text-xs font-medium rounded ${item.status === 'Claimed' ? 'bg-[#E5E2DC] text-[#4B5563] cursor-not-allowed' : 'bg-[#14532D] text-white hover:bg-[#166534]'}">
+                    ${item.status === 'Claimed' ? 'Claimed for Reuse' : 'Claim Batch for Recycling / Craft Reuse'}
+                  </button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        ` : `
+          <div class="max-w-lg space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-[#111827] mb-1" for="lfFactory">Factory / Agro-SME Name</label>
+              <input id="lfFactory" type="text" placeholder="e.g., Kampong Speu Textile Mill" value="${escHtml(lf.newFactory)}" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm">
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-[#111827] mb-1" for="lfCategory">By-Product Category</label>
+                <select id="lfCategory" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm bg-white">
+                  <option ${lf.newCategory === 'Garment Offcuts' ? 'selected' : ''}>Garment Offcuts</option>
+                  <option ${lf.newCategory === 'Rice Husks' ? 'selected' : ''}>Rice Husks</option>
+                  <option ${lf.newCategory === 'Cashew Shells' ? 'selected' : ''}>Cashew Shells</option>
+                  <option ${lf.newCategory === 'Cardboard' ? 'selected' : ''}>Cardboard</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-[#111827] mb-1" for="lfKg">Weight Available (kg)</label>
+                <input id="lfKg" type="number" min="10" step="10" value="${lf.newKg}" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm font-mono-code">
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-[#111827] mb-1" for="lfMaterial">Material Description</label>
+              <input id="lfMaterial" type="text" placeholder="e.g., Clean sorted denim trimmings" value="${escHtml(lf.newMaterial)}" class="w-full px-3 py-2 border border-[#E5E2DC] rounded-md text-sm">
+            </div>
+            <button id="btnLfPost" type="button" class="px-4 py-2 text-sm font-medium rounded-md bg-[#14532D] text-white hover:bg-[#166534]">
+              Publish to Circular Exchange
+            </button>
+          </div>
+        `}
+      </section>
+    `;
+  }
+
+  // ---------- RENDER ENGINE ----------
+  function render() {
+    const container = document.getElementById('prototypeContainer');
+    container.className = state.viewMode === 'mobile' ? 'frame-mobile' : 'frame-desktop';
+
+    let html = '';
+    if (state.activeIdea === 'greenlight') html = renderGreenLight();
+    else if (state.activeIdea === 'eprlink') html = renderEprLink();
+    else if (state.activeIdea === 'traceforest') html = renderTraceForest();
+    else if (state.activeIdea === 'fairdebt') html = renderFairDebt();
+    else if (state.activeIdea === 'ecoledger') html = renderEcoLedger();
+    else if (state.activeIdea === 'loopfactory') html = renderLoopFactory();
+
+    container.innerHTML = html;
+
+    document.querySelectorAll('#ideaNav button').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.idea === state.activeIdea);
+    });
+  }
+
+  // ---------- GLOBAL EVENT WIRING ----------
+  document.getElementById('ideaNav').addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-idea]');
+    if (!btn) return;
+    state.activeIdea = btn.dataset.idea;
+    render();
+  });
+
+  document.getElementById('btnViewDesktop').addEventListener('click', () => {
+    state.viewMode = 'desktop';
+    document.getElementById('btnViewDesktop').className = 'px-2.5 py-1.5 rounded font-medium bg-[#111827] text-white';
+    document.getElementById('btnViewMobile').className = 'px-2.5 py-1.5 rounded font-medium text-[#4B5563] hover:text-[#111827]';
+    render();
+  });
+
+  document.getElementById('btnViewMobile').addEventListener('click', () => {
+    state.viewMode = 'mobile';
+    document.getElementById('btnViewMobile').className = 'px-2.5 py-1.5 rounded font-medium bg-[#111827] text-white';
+    document.getElementById('btnViewDesktop').className = 'px-2.5 py-1.5 rounded font-medium text-[#4B5563] hover:text-[#111827]';
+    render();
+  });
+
+  const modal = document.getElementById('figmaModal');
+  document.getElementById('btnOpenFigmaModal').addEventListener('click', () => {
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  });
+  function closeModal() {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+  document.getElementById('btnCloseFigmaModal').addEventListener('click', closeModal);
+  document.getElementById('btnCloseFigmaModal2').addEventListener('click', closeModal);
+  modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+  // Delegated events inside active prototype
+  const root = document.getElementById('prototypeContainer');
+
+  root.addEventListener('click', (e) => {
+    const subBtn = e.target.closest('button[data-subtab]');
+    if (subBtn) {
+      state.subTab[state.activeIdea] = subBtn.dataset.subtab;
+      render();
+      return;
+    }
+
+    // GreenLight actions
+    const glFilterBtn = e.target.closest('button[data-gl-filter]');
+    if (glFilterBtn) {
+      state.greenlight.filter = glFilterBtn.dataset.glFilter;
+      render();
+      return;
+    }
+    if (e.target.id === 'btnGlSubmit') {
+      const g = state.greenlight;
+      const res = computeGreenLightRating(g);
+      const nextId = 'GL-2026-0' + (g.queue.length + 1);
+      g.queue.unshift({
+        id: nextId,
+        business: g.businessName.trim() || 'Unnamed MSME',
+        sector: g.sector,
+        amount: Math.max(0, Number(g.loanAmount) || 0),
+        rating: res.rating,
+        date: '2026-11-20'
+      });
+      state.subTab.greenlight = 'queue';
+      showToast(`Submitted ${nextId} (${res.rating}) to Officer Review Queue.`);
+      render();
+      return;
+    }
+    if (e.target.id === 'btnGlCopyReport') {
+      const g = state.greenlight;
+      const res = computeGreenLightRating(g);
+      copyText(`NBC Sustainable Finance Taxonomy Screening\nBusiness: ${g.businessName}\nSector: ${g.sector}\nLoan: $${g.loanAmount}\nResult: ${res.label}\nNotes: ${res.reason}`, 'Copied NBC screening summary!');
+      return;
+    }
+
+    // EPR-Link actions
+    if (e.target.id === 'btnEprLog') {
+      const ep = state.eprlink;
+      const id = 'EPR-' + (8841 + ep.batches.length);
+      const kg = Math.max(0.5, Number(ep.weightKg) || 1);
+      ep.batches.unshift({
+        id,
+        shop: ep.shopName.trim() || 'Local SME Shop',
+        type: ep.wasteType,
+        kg,
+        rateUsd: WASTE_RATES[ep.wasteType] || 1.0,
+        collector: ep.collector.split(' ')[0] + ' (Verified)',
+        status: 'Paid Fairly'
+      });
+      showToast(`Logged ${id} (${kg} kg) with fair collector payout.`);
+      render();
+      return;
+    }
+    if (e.target.id === 'btnEprCopy') {
+      const totalKg = state.eprlink.batches.reduce((s, b) => s + b.kg, 0);
+      copyText(`Cambodia 6-Month MoE EPR Compliance Summary\nTotal Batches: ${state.eprlink.batches.length}\nTotal Safely Recycled: ${totalKg.toFixed(1)} kg`, 'Copied 6-month MoE EPR summary!');
+      return;
+    }
+
+    // TraceForest actions
+    const plotBtn = e.target.closest('button[data-plot-id]');
+    if (plotBtn) {
+      state.traceforest.selectedId = plotBtn.dataset.plotId;
+      render();
+      return;
+    }
+    if (e.target.id === 'btnTfAdd') {
+      const tf = state.traceforest;
+      const name = tf.newFarmer.trim() || 'New Smallholder Farmer';
+      const id = 'PLOT-KH-0' + (tf.plots.length + 1);
+      tf.plots.unshift({
+        id,
+        farmer: name,
+        crop: tf.newCrop,
+        province: tf.newProvince,
+        ha: Math.max(0.2, Number(tf.newHa) || 1),
+        lat: 12.1 + (tf.plots.length * 0.15),
+        lng: 105.5 + (tf.plots.length * 0.12),
+        pre2020: tf.newPre2020,
+        priceUsd: Math.max(0.2, Number(tf.newPrice) || 1.5),
+        benchmarkUsd: 1.50
+      });
+      tf.selectedId = id;
+      tf.newFarmer = '';
+      showToast(`Registered ${id} for ${name}.`);
+      render();
+      return;
+    }
+    if (e.target.id === 'btnTfCopyGeo') {
+      const selected = state.traceforest.plots.find(p => p.id === state.traceforest.selectedId) || state.traceforest.plots[0];
+      copyText(JSON.stringify(selected, null, 2), `Copied EUDR GeoJSON for ${selected.id}!`);
+      return;
+    }
+
+    // FairDebt actions
+    if (e.target.id === 'btnFdCopyLetter') {
+      const pre = root.querySelector('pre');
+      if (pre) copyText(pre.textContent, 'Copied restructuring request letter!');
+      return;
+    }
+
+    // EcoLedger actions
+    if (e.target.id === 'btnEcAdd') {
+      const ec = state.ecoledger;
+      const amt = Math.max(0.25, Number(ec.amountUsd) || 1);
+      const id = 'RCP-' + (501 + ec.sales.length);
+      ec.sales.unshift({
+        id,
+        item: ec.itemName.trim() || 'Shop Sale',
+        amount: amt,
+        method: ec.paymentMethod,
+        paperless: ec.paperless,
+        time: 'Now'
+      });
+      showToast(`Recorded ${id} ($${amt.toFixed(2)}) — paperless receipt ready!`);
+      render();
+      return;
+    }
+    if (e.target.id === 'btnEcCopyBank') {
+      const total = state.ecoledger.sales.reduce((s, x) => s + x.amount, 0);
+      copyText(`EcoLedger KH Bank Credit Summary\nRecorded Sales: ${state.ecoledger.sales.length}\nTotal Revenue: $${total.toFixed(2)}`, 'Copied bank cash-flow summary!');
+      return;
+    }
+
+    // LoopFactory actions
+    const lfCatBtn = e.target.closest('button[data-lf-cat]');
+    if (lfCatBtn) {
+      state.loopfactory.categoryFilter = lfCatBtn.dataset.lfCat;
+      render();
+      return;
+    }
+    const lfClaimBtn = e.target.closest('button[data-lf-claim]');
+    if (lfClaimBtn) {
+      const item = state.loopfactory.listings.find(x => x.id === lfClaimBtn.dataset.lfClaim);
+      if (item && item.status !== 'Claimed') {
+        item.status = 'Claimed';
+        showToast(`Claimed ${item.kg} kg from ${item.factory} for circular reuse!`);
+        render();
+      }
+      return;
+    }
+    if (e.target.id === 'btnLfPost') {
+      const lf = state.loopfactory;
+      const id = 'LF-' + (301 + lf.listings.length);
+      lf.listings.unshift({
+        id,
+        factory: lf.newFactory.trim() || 'Cambodian Green SME',
+        category: lf.newCategory,
+        material: lf.newMaterial.trim() || 'Clean Sorted Factory By-Product',
+        kg: Math.max(10, Number(lf.newKg) || 100),
+        priceUsd: 0.18,
+        location: 'Phnom Penh',
+        status: 'Available'
+      });
+      lf.newFactory = '';
+      lf.newMaterial = '';
+      state.subTab.loopfactory = 'market';
+      showToast(`Published ${id} to the B2B Circular Marketplace!`);
+      render();
+      return;
+    }
+  });
+
+  // Live input / change handlers
+  root.addEventListener('input', (e) => {
+    const id = e.target.id;
+    const val = e.target.value;
+    if (id === 'glBusiness') state.greenlight.businessName = val;
+    else if (id === 'glAmount') { state.greenlight.loanAmount = Number(val) || 0; render(); }
+    else if (id === 'eprShop') state.eprlink.shopName = val;
+    else if (id === 'eprWeight') { state.eprlink.weightKg = Number(val) || 0; render(); }
+    else if (id === 'tfFarmer') state.traceforest.newFarmer = val;
+    else if (id === 'tfHa') state.traceforest.newHa = Number(val) || 0;
+    else if (id === 'tfPrice') state.traceforest.newPrice = Number(val) || 0;
+    else if (id === 'fdIncome') { state.fairdebt.monthlyIncome = Number(val) || 0; render(); }
+    else if (id === 'fdExisting') { state.fairdebt.existingDebt = Number(val) || 0; render(); }
+    else if (id === 'fdLoan') { state.fairdebt.newLoan = Number(val) || 0; render(); }
+    else if (id === 'fdRate') { state.fairdebt.monthlyRate = Number(val) || 0; render(); }
+    else if (id === 'fdTerm') { state.fairdebt.termMonths = Number(val) || 1; render(); }
+    else if (id === 'fdReduced') { state.fairdebt.reducedIncome = Number(val) || 0; render(); }
+    else if (id === 'fdBorrower') { state.fairdebt.borrowerName = val; render(); }
+    else if (id === 'ecItem') state.ecoledger.itemName = val;
+    else if (id === 'ecAmount') state.ecoledger.amountUsd = Number(val) || 0;
+    else if (id === 'lfFactory') state.loopfactory.newFactory = val;
+    else if (id === 'lfKg') state.loopfactory.newKg = Number(val) || 0;
+    else if (id === 'lfMaterial') state.loopfactory.newMaterial = val;
+  });
+
+  root.addEventListener('change', (e) => {
+    const id = e.target.id;
+    if (id === 'glSector') { state.greenlight.sector = e.target.value; render(); }
+    else if (id === 'glTsc') { state.greenlight.tsc = e.target.checked; render(); }
+    else if (id === 'glDnsh') { state.greenlight.dnsh = e.target.checked; render(); }
+    else if (id === 'glMss') { state.greenlight.mss = e.target.checked; render(); }
+    else if (id === 'eprType') { state.eprlink.wasteType = e.target.value; render(); }
+    else if (id === 'eprCollector') { state.eprlink.collector = e.target.value; render(); }
+    else if (id === 'tfCrop') state.traceforest.newCrop = e.target.value;
+    else if (id === 'tfProvince') state.traceforest.newProvince = e.target.value;
+    else if (id === 'tfPre2020') state.traceforest.newPre2020 = e.target.checked;
+    else if (id === 'fdShock') { state.fairdebt.shockType = e.target.value; render(); }
+    else if (id === 'ecMethod') state.ecoledger.paymentMethod = e.target.value;
+    else if (id === 'ecPaperless') state.ecoledger.paperless = e.target.checked;
+    else if (id === 'lfCategory') state.loopfactory.newCategory = e.target.value;
+  });
+
+  // Initial render
+  render();
+})();
+</script>
+</body>
+</html>
